@@ -67,7 +67,7 @@ export default {
       alert(`ID generado: ${newId}`);
       
       //navego a la pagina home
-      this.$router.push('/HomeView');  
+      this.$router.push('/RegisterView');  
 
       this.error = null; // Resetear errores
     },
