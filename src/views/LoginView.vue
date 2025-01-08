@@ -7,7 +7,7 @@
         id="userId"
         v-model="userId"
         @input="error = null"
-        placeholder="Ingresa o genera un ID"
+        placeholder="Genera un ID"
         disabled
       />
       <button @click="generateAndSaveId"> Generar ID </button>

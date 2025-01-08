@@ -1,26 +1,15 @@
 <template>
-
     <div>
       <h1>Iniciar Sesión</h1>
-      <form @submit.prevent="saveCredentials">
-        <div>
-          <label for="email">Email:</label>
-          <input type="email" id="email" v-model="email" required />
-        </div>
-        <div>
-          <label for="password">Contraseña:</label>
-          <input type="password" id="password" v-model="password" required />
-        </div>
-        <button type="submit">Guardar y continuar</button>
-      </form>
+      <button @click="showInputAlert">INGRESA AQUÍ</button>
     </div>
-</template>
+  </template>
   
   <script>
-
+  import Swal from "sweetalert2";
+  
   export default {
-    name: 'RegisterView',
-
+    name: "RegisterView",
     data() {
       return {
         email: "",
@@ -28,13 +17,60 @@
       };
     },
     methods: {
-      saveCredentials() {
-        localStorage.setItem("email", this.email);
-        localStorage.setItem("password", this.password);
-        alert("Credenciales guardadas correctamente");
-        this.$router.push("/HomeView"); 
+      async showInputAlert() {
+        // Pedir email
+        const { value: email } = await Swal.fire({
+          title: "Ingresa tu email",
+          input: "email",
+          inputLabel: "Email",
+          inputPlaceholder: "ejemplo@correo.com",
+          showCancelButton: true,
+        });
+  
+        if (email) {
+          this.email = email;
+  
+          // Pedir contraseña
+          const { value: password } = await Swal.fire({
+            title: "Ingresa tu contraseña",
+            input: "password",
+            inputLabel: "Contraseña",
+            inputPlaceholder: "Ingresa tu contraseña",
+            inputAttributes: {
+              maxlength: 15,
+              autocapitalize: "off",
+              autocorrect: "off",
+            },
+            showCancelButton: true,
+          });
+  
+          if (password) {
+            this.password = password;
+  
+            // Guardar en localStorage
+            localStorage.setItem("userEmail", this.email);
+            localStorage.setItem("userPassword", this.password);
+  
+            // Confirmación final
+            Swal.fire({
+                icon: "success",
+                title: "¡Credenciales guardadas!",
+                text: `Email: ${this.email}`,
+                timer: 1000, // Cierra automáticamente después de 1 segundo
+                timerProgressBar: true, // Muestra la barra de progreso
+                willClose: () => {
+                // Redirigir a HomeView después de que el modal se cierre
+                 this.$router.push("/HomeView");
+                },
+              
+            });
+
+           
+          }
+        }
       },
     },
   };
   </script>
+  
   
