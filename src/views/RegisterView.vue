@@ -54,7 +54,7 @@
             // Confirmación final
             Swal.fire({
                 icon: "success",
-                title: "¡Credenciales guardadas!",
+                title: "¡Registro Exitoso!",
                 text: `Email: ${this.email}`,
                 timer: 1000, // Cierra automáticamente después de 1 segundo
                 timerProgressBar: true, // Muestra la barra de progreso

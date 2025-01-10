@@ -2,6 +2,7 @@
   <nav>
     <router-link to="/Home<view"></router-link>
     <router-link to="/Home<view"></router-link>
+    <router-link to="/CompraCripto"></router-link>
     
   </nav>
   <router-view/>

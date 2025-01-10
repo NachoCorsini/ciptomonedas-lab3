@@ -3,23 +3,23 @@
     <h1>Bienvenido a Krustywallet</h1>
     <p>Tu billetera digital para administrar y comprar criptomonedas de forma segura.</p>
     
-    <!-- Sección de imágenes con epígrafes -->
+    <!-- Sección de imágenes con epígrafes como botones -->
     <div class="features">
-      <div class="feature">
-        <img src ="../assets/compracripto.png" alt="Comprar Criptomonedas" />
+      <div class="feature" @click="navigateTo('CompraCripto')">
+        <img src="../assets/compracripto.png" alt="Comprar Criptomonedas" />
         <p>Compra tus criptos preferidas</p>
       </div>
-      <div class="feature">
+      <div class="feature" @click="navigateTo('VentaCripto')">
         <img src="../assets/ventacripto.png" alt="Vender Criptomonedas" />
         <p>Vende tus criptos cuando lo necesites</p>
       </div>
-      <div class="feature">
-        <img src="../assets/transfercripto.jpg" alt="Estado de tus Criptomonedas" />
-        <p>Transfiere criptos a tus amigos rápidamente</p>
+      <div class="feature" @click="navigateTo('TransferCripto')">
+        <img src="../assets/transfercripto.jpg" alt="Estado de Criptomonedas" />
+        <p>El estado de tus criptos en tiempo real</p>
       </div>
-      <div class="feature">
+      <div class="feature" @click="navigateTo('PortfolioCripto')">
         <img src="../assets/portfoliocripto.jpg" alt="Historial de Movimientos" />
-        <p>Monitorea el valor de tus criptos en tiempo real</p>
+        <p>Observa todos tus movimietnos de compra y venta </p>
       </div>
     </div>
   </div>
@@ -28,7 +28,12 @@
 <script>
 export default {
   name: 'HomeView',
-
+  methods: {
+    navigateTo(CompraCripto) {
+      // Redirige a la página específica según el nombre de la ruta
+      this.$router.push({ name: CompraCripto });
+    },
+  },
 };
 </script>
 
@@ -59,6 +64,15 @@ p {
 .feature {
   width: 200px;
   text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.feature:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(5, 170, 143, 0.807);
 }
 
 .feature img {
