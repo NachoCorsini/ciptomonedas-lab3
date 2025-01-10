@@ -1,21 +1,13 @@
 <template>
-    <div>
-      <h2>Login</h2>
-      <label for="userId">ID alfanumérico:</label>
-      <input
-        type="text"
-        id="userId"
-        v-model="userId"
-        @input="error = null"
-        placeholder="Genera un ID"
-        disabled
-      />
-      <button @click="generateAndSaveId"> Generar ID </button>
-      <p v-if="error" style="color: red;">{{ error }}</p>
-    </div>
+  <div>
+    <h2>Login</h2>
+    <button class="generate-id-button" @click="generateAndSaveId">Generar ID</button>
+    <p v-if="error" style="color: red;">{{ error }}</p>
+  </div>
 </template>
 
 <script>
+import Swal from 'sweetalert2'; // Importar SweetAlert2
 import { mapActions } from 'vuex';
 
 export default {
@@ -52,7 +44,7 @@ export default {
     },
 
     // Generar y guardar un ID automáticamente, luego navegar
-    generateAndSaveId() {
+    async generateAndSaveId() {
       let newId;
 
       // Generar un nuevo ID que no esté repetido
@@ -64,9 +56,16 @@ export default {
       this.userId = newId;
       this.saveIdToLocalStorage(newId);
       this.saveUserId(newId);
-      alert(`ID generado: ${newId}`);
-      
-      //navego a la pagina home
+
+      // Mostrar el SweetAlert2 con el ID generado
+      await Swal.fire({
+        title: 'ID generado',
+        text: `Tu ID generado es: ${newId}`,
+        icon: 'success',
+        confirmButtonText: 'Ok',
+      });
+
+      // Navegar a la página de registro
       this.$router.push('/RegisterView');  
 
       this.error = null; // Resetear errores
@@ -74,3 +73,30 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.generate-id-button {
+  background-color: #1ce9b9; /* Color de fondo verde */
+  color: rgb(15, 13, 13); /* Color de texto blanco */
+  padding: 15px 32px; /* Espaciado interno */
+  font-size: 16px; /* Tamaño de fuente */
+  border: none; /* Sin borde */
+  border-radius: 8px; /* Bordes redondeados */
+  cursor: pointer; /* Cursor de mano al pasar por encima */
+  transition: background-color 0.3s ease; /* Transición suave para el hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra sutil */
+}
+
+.generate-id-button:hover {
+  background-color: #96edd6; /* Color de fondo al pasar el mouse */
+}
+
+.generate-id-button:active {
+  background-color: #388e3c; /* Color de fondo cuando se hace clic */
+}
+
+p {
+  font-size: 14px;
+  margin-top: 10px;
+}
+</style>

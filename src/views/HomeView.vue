@@ -15,7 +15,7 @@
       </div>
       <div class="feature" @click="navigateTo('TransferCripto')">
         <img src="../assets/transfercripto.jpg" alt="Estado de Criptomonedas" />
-        <p>El estado de tus criptos en tiempo real</p>
+        <p>Visualiza el estado de tus criptos en tiempo real</p>
       </div>
       <div class="feature" @click="navigateTo('PortfolioCripto')">
         <img src="../assets/portfoliocripto.jpg" alt="Historial de Movimientos" />
@@ -29,9 +29,9 @@
 export default {
   name: 'HomeView',
   methods: {
-    navigateTo(CompraCripto) {
+    navigateTo(routname) {
       // Redirige a la página específica según el nombre de la ruta
-      this.$router.push({ name: CompraCripto });
+      this.$router.push({ name: routname });
     },
   },
 };
