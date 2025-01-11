@@ -1,26 +1,82 @@
 <template>
-  <div>
-    <h2>Login</h2>
-    <button class="generate-id-button" @click="generateAndSaveId">Generar ID</button>
-    <p v-if="error" style="color: red;">{{ error }}</p>
+  <div class="login-container">
+    <div class="login-box">
+      <h2>Iniciar sesión</h2>
+
+      <!-- Formulario de login -->
+      <div class="input-group">
+        <label for="email">Correo electrónico:</label>
+        <input v-model="userEmail" type="email" id="email" placeholder="Introduce tu email" required />
+      </div>
+      <div class="input-group">
+        <label for="password">Contraseña:</label>
+        <input v-model="userPassword" type="password" id="password" placeholder="Introduce tu contraseña" required />
+      </div>
+
+      <!-- Botón de login -->
+      <button @click="handleLogin">Iniciar sesión</button>
+
+      <!-- Mensaje de error -->
+      <p v-if="error" class="error-message">{{ error }}</p>
+
+      <!-- Muestra ID y Email de forma más pequeña -->
+      <div v-if="userEmail && userId" class="user-info">
+        <span class="user-details">
+          <span>ID: {{ userId }}</span>
+          <span>Email: {{ userEmail }}</span>
+        </span>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import Swal from 'sweetalert2'; // Importar SweetAlert2
 import { mapActions } from 'vuex';
+import Swal from 'sweetalert2';
 
 export default {
   data() {
     return {
-      userId: '', // ID ingresado o generado
-      error: null, // Mensaje de error para las validaciones
+      userEmail: '',
+      userPassword: '',
+      error: null, // Mensaje de error
+      userId: '',  // Guardar el ID aquí para mostrarlo
     };
   },
   methods: {
-    ...mapActions(['saveUserId']), // Acción para guardar el ID en Vuex
+    ...mapActions(['saveUserId', 'saveUserEmail']), // Mapear acciones para guardar en Vuex
 
-    // Generar un ID alfanumérico aleatorio
+    // Verificar si el email y la contraseña están correctos
+    async handleLogin() {
+      if (!this.userEmail || !this.userPassword) {
+        this.error = 'Por favor, ingresa ambos campos.';
+        return;
+      }
+
+      // Generar un ID alfanumérico aleatorio
+      const newId = this.generateRandomId();
+
+      // Guardar el email y el ID en Vuex
+      this.saveUserId(newId);
+      this.saveUserEmail(this.userEmail);
+
+      // Guardar el ID, email y password en localStorage
+      const user = { id: newId, email: this.userEmail, password: this.userPassword };
+      localStorage.setItem('user', JSON.stringify(user));
+
+      // Mostrar SweetAlert2
+      await Swal.fire({
+        title: 'Bienvenido',
+        text: `Tu ID generado es: ${newId}`,
+        icon: 'success',
+        confirmButtonText: 'Ok',
+      });
+
+      // Navegar a la página principal
+      this.$router.push('/HomeView');
+    },
+
+    // Generar ID aleatorio alfanumérico
     generateRandomId(length = 8) {
       const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
       let result = '';
@@ -29,74 +85,102 @@ export default {
       }
       return result;
     },
-
-    // Verifica si el ID ya existe en el localStorage
-    checkIdInLocalStorage(id) {
-      const storedUsers = JSON.parse(localStorage.getItem('users')) || [];
-      return storedUsers.includes(id); // Retorna true si el ID ya existe
-    },
-
-    // Guarda el ID en el localStorage
-    saveIdToLocalStorage(id) {
-      const storedUsers = JSON.parse(localStorage.getItem('users')) || [];
-      storedUsers.push(id); // Agrega el ID a la lista
-      localStorage.setItem('users', JSON.stringify(storedUsers)); // Guarda la lista actualizada
-    },
-
-    // Generar y guardar un ID automáticamente, luego navegar
-    async generateAndSaveId() {
-      let newId;
-
-      // Generar un nuevo ID que no esté repetido
-      do {
-        newId = this.generateRandomId(); // Generar ID aleatorio
-      } while (this.checkIdInLocalStorage(newId));
-
-      // Guardar el ID generado
-      this.userId = newId;
-      this.saveIdToLocalStorage(newId);
-      this.saveUserId(newId);
-
-      // Mostrar el SweetAlert2 con el ID generado
-      await Swal.fire({
-        title: 'ID generado',
-        text: `Tu ID generado es: ${newId}`,
-        icon: 'success',
-        confirmButtonText: 'Ok',
-      });
-
-      // Navegar a la página de registro
-      this.$router.push('/RegisterView');  
-
-      this.error = null; // Resetear errores
-    },
   },
 };
 </script>
 
 <style scoped>
-.generate-id-button {
-  background-color: #1ce9b9; /* Color de fondo verde */
-  color: rgb(15, 13, 13); /* Color de texto blanco */
-  padding: 15px 32px; /* Espaciado interno */
-  font-size: 16px; /* Tamaño de fuente */
-  border: none; /* Sin borde */
-  border-radius: 8px; /* Bordes redondeados */
-  cursor: pointer; /* Cursor de mano al pasar por encima */
-  transition: background-color 0.3s ease; /* Transición suave para el hover */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra sutil */
+/* Contenedor principal */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f4f4f9;
 }
 
-.generate-id-button:hover {
-  background-color: #96edd6; /* Color de fondo al pasar el mouse */
+/* Caja del formulario */
+.login-box {
+  background-image: url('../assets/krusty.png'); /* Reemplaza con la ruta de tu imagen */
+  background-size: cover;
+  background-position: center;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  text-align: center;
+  color: #fff; /* Color de texto blanco para contrastar con la imagen */
 }
 
-.generate-id-button:active {
-  background-color: #388e3c; /* Color de fondo cuando se hace clic */
+
+/* Título */
+h2 {
+  color: #fff; /* Color de texto blanco */
+  margin-bottom: 20px;
+  font-size: 22px;
 }
 
-p {
+/* Estilos para los inputs */
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
   font-size: 14px;
+  color: #fff; /* Color blanco para los labels */
+  text-align: left;
+  display: block;
+  margin-bottom: 5px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 10px;
+  outline: none;
+}
+
+input:focus {
+  border-color: #1ce9b9;
+}
+
+/* Estilo para el botón */
+button {
+  background-color: #1ce9b9;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 16px;
+}
+
+button:hover {
+  background-color: #17a895;
+}
+
+/* Mensaje de error */
+.error-message {
+  color: red;
+  font-size: 12px;
   margin-top: 10px;
+}
+
+/* Mostrar los datos del usuario en pequeño */
+.user-info {
+  margin-top: 20px;
+  font-size: 12px;
+  color: #fff;
+}
+
+.user-details span {
+  display: block;
+  font-size: 12px;
+  color: #fff;
 }
 </style>

@@ -1,5 +1,14 @@
 <template>
-  <div class="home">
+  <div>
+    <!-- Sección superior con el ID y el email del usuario -->
+    <div class="user-info">
+      <span class="user-details">
+        <span>ID: {{ userId }}</span>
+        <span>Email: {{ userEmail }}</span>
+      </span>
+      <button class="logout-btn" @click="logout">Salir</button>
+    </div>
+    
     <h1>Bienvenido a Krustywallet</h1>
     <p>Tu billetera digital para administrar y comprar criptomonedas de forma segura.</p>
     
@@ -13,13 +22,13 @@
         <img src="../assets/ventacripto.png" alt="Vender Criptomonedas" />
         <p>Vende tus criptos cuando lo necesites</p>
       </div>
-      <div class="feature" @click="navigateTo('TransferCripto')">
+      <div class="feature" @click="navigateTo('HistorialMovs')">
         <img src="../assets/transfercripto.jpg" alt="Estado de Criptomonedas" />
         <p>Visualiza el estado de tus criptos en tiempo real</p>
       </div>
       <div class="feature" @click="navigateTo('PortfolioCripto')">
         <img src="../assets/portfoliocripto.jpg" alt="Historial de Movimientos" />
-        <p>Observa todos tus movimietnos de compra y venta </p>
+        <p>Observa todos tus movimientos de compra y venta</p>
       </div>
     </div>
   </div>
@@ -28,10 +37,29 @@
 <script>
 export default {
   name: 'HomeView',
+  data() {
+    return {
+      userId: '',
+      userEmail: '',
+    };
+  },
+  mounted() {
+    // Obtener datos del usuario desde Vuex o localStorage
+    const user = JSON.parse(localStorage.getItem('user')) || {};
+    this.userId = user.id || 'No disponible';
+    this.userEmail = user.email || 'No disponible';
+  },
   methods: {
-    navigateTo(routname) {
+    navigateTo(routename) {
       // Redirige a la página específica según el nombre de la ruta
-      this.$router.push({ name: routname });
+      this.$router.push({ name: routename });
+    },
+    logout() {
+      // Eliminar los datos del usuario en localStorage
+      localStorage.removeItem('user');
+      
+      // Redirigir a la vista de login
+      this.$router.push({ name: 'LoginView' });
     },
   },
 };
@@ -72,7 +100,7 @@ p {
 
 .feature:hover {
   transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(5, 170, 143, 0.807);
+  box-shadow: 0 4px 8px rgba(22, 23, 23, 0.807);
 }
 
 .feature img {
@@ -86,5 +114,33 @@ p {
   font-size: 1em;
   color: #333;
   margin-top: 10px;
+}
+
+.user-info {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-details {
+  font-size: 0.9em; /* Más pequeño */
+  color: #333;
+}
+
+.logout-btn {
+  padding: 6px 12px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.8em; /* Más pequeño */
+}
+
+.logout-btn:hover {
+  background-color: #e53935;
 }
 </style>
