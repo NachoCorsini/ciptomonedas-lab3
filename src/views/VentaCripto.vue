@@ -1,51 +1,42 @@
 <template>
   <div class="VentaCripto">
-    <!-- Icono y texto de Home -->
-    <div class="home-icon">
-      <router-link to="/HomeView" class="home-link">
-        <span class="icon">
-          <!-- Ícono SVG de casa -->
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="home-svg"
-          >
-            <path d="M3 9l9-7 9 7" />
-            <path d="M9 22V12h6v10" />
-          </svg>
-        </span>
-        <span class="text">Home</span>
-      </router-link>
-    </div>
+    <h1>Vender Criptomonedas</h1>
 
-    <h1>Vende tus Criptomonedas</h1>
     <div class="crypto-select">
       <label for="crypto">Selecciona una criptomoneda:</label>
       <select v-model="selectedCrypto" id="crypto" @change="calcularPrecio">
         <option disabled value="">-- Selecciona --</option>
-        <option value="usdt">USDT</option>
-        <option value="btc">BTC</option>
-        <option value="eth">Ethereum</option>
+        <option
+          v-for="crypto in criptomonedasDisponibles"
+          :key="crypto.id"
+          :value="crypto.id"
+        >
+          {{ crypto.nombre }} (Disponible: {{ crypto.cantidad }})
+        </option>
       </select>
     </div>
+
+    <div v-if="valorCrypto !== null" class="crypto-value">
+      <p>Valor actual de la criptomoneda: {{ valorCrypto }} ARS</p>
+    </div>
+
     <div class="crypto-amount">
       <label for="amount">Cantidad a vender:</label>
       <input
         type="number"
         v-model="amount"
         id="amount"
+        :max="cantidadDisponible"
         min="0"
-        @input="calcularPrecio"
+        step="0.0001"
+        @input="calcularPrecioTotal"
       />
     </div>
+
     <div v-if="precioTotal !== null" class="crypto-price">
-      <p>Precio total: {{ precioTotal }} ARS</p>
+      <p>Monto a recibir: {{ precioTotal }} ARS</p>
     </div>
+
     <button @click="confirmSale">Vender</button>
   </div>
 </template>
@@ -61,49 +52,79 @@ export default {
       selectedCrypto: "",
       amount: 0,
       precioTotal: null,
-      criptomonedas: [
-        { id: "usdt", nombre: "USDT" },
-        { id: "btc", nombre: "BTC" },
-        { id: "eth", nombre: "Ethereum" },
+      valorCrypto: null,
+      cantidadDisponible: 0,
+      criptomonedasDisponibles: [
+        { id: "usdt", nombre: "USDT", cantidad: 5 },
+        { id: "btc", nombre: "BTC", cantidad: 0.5 },
+        { id: "eth", nombre: "Ethereum", cantidad: 1.2 },
       ],
     };
   },
   methods: {
-    async calcularPrecio() {
-      if (!this.selectedCrypto || this.amount <= 0) {
+    calcularPrecio() {
+      if (!this.selectedCrypto) {
+        this.valorCrypto = null;
+        this.cantidadDisponible = 0;
+        return;
+      }
+
+      // Obtiene la cantidad disponible
+      const cryptoSeleccionada = this.criptomonedasDisponibles.find(
+        (c) => c.id === this.selectedCrypto
+      );
+      if (cryptoSeleccionada) {
+        this.cantidadDisponible = cryptoSeleccionada.cantidad;
+
+        // Simula obtener el valor actual de la criptomoneda
+        const url = `https://criptoya.com/api/argenbtc/${cryptoSeleccionada.id}/ars`;
+        axios
+          .get(url)
+          .then((response) => {
+            this.valorCrypto = response.data.ask;
+          })
+          .catch((error) => {
+            console.error(
+              "Error al obtener el valor de la criptomoneda:",
+              error
+            );
+            this.valorCrypto = null;
+          });
+      }
+    },
+    calcularPrecioTotal() {
+      if (!this.selectedCrypto || this.amount <= 0 || !this.valorCrypto) {
         this.precioTotal = null;
         return;
       }
-      const criptomoneda = this.criptomonedas.find(
-        (c) => c.id === this.selectedCrypto
-      );
-      if (criptomoneda) {
-        const url = `https://criptoya.com/api/argenbtc/${criptomoneda.id}/ars/${this.amount}`;
-        try {
-          const response = await axios.get(url);
-          this.precioTotal = response.data.ask * this.amount.toFixed(3);
-          this.precioTotal = new Intl.NumberFormat("de-DE").format(this.precioTotal);
-        } catch (error) {
-          console.error("Error al calcular el precio:", error);
-          this.precioTotal = null;
-        }
+
+      if (this.amount > this.cantidadDisponible) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "No tienes suficiente cantidad para vender.",
+        });
+        this.precioTotal = null;
+        return;
       }
+
+      this.precioTotal = (this.amount * this.valorCrypto).toFixed(2);
     },
     async confirmSale() {
       if (
         !this.selectedCrypto ||
         this.amount <= 0 ||
-        this.precioTotal === null
+        !this.precioTotal ||
+        this.amount > this.cantidadDisponible
       ) {
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "Debes seleccionar una criptomoneda y seleccionar la cantidad.",
+          text: "Verifica que los datos ingresados sean válidos.",
         });
         return;
       }
 
-      // Confirmación con SweetAlert2
       const result = await Swal.fire({
         title: "¿Estás seguro?",
         text: `Vas a vender ${
@@ -116,20 +137,23 @@ export default {
       });
 
       if (result.isConfirmed) {
+        const ventaData = {
+          user_id: "usuario_logueado", // Reemplazar por el usuario real
+          action: "sale",
+          crypto_code: this.selectedCrypto,
+          crypto_amount: this.amount,
+          money: this.precioTotal,
+          datetime: new Date().toLocaleString("es-AR"),
+        };
+
         try {
-          // Guardar movimiento en localStorage (venta)
-          const historialMovimientos =
-            JSON.parse(localStorage.getItem("historialMovimientos")) || [];
-          historialMovimientos.push({
-            tipo: "venta", // Tipo de movimiento
-            nombre: this.selectedCrypto,
-            precio: this.precioTotal,
-            cantidad: this.amount,
-          });
-          localStorage.setItem(
-            "historialMovimientos",
-            JSON.stringify(historialMovimientos)
-          );
+          const url = "https://laboratorio3-f36a.restdb.io/rest/transactions";
+          const headers = {
+            "x-apikey": "60eb09146661365596af552f",
+            "Content-Type": "application/json",
+          };
+
+          await axios.post(url, ventaData, { headers });
 
           Swal.fire({
             icon: "success",
@@ -138,6 +162,33 @@ export default {
               this.amount
             } ${this.selectedCrypto.toUpperCase()}.`,
           });
+
+          // Actualizar historial
+          const historialMovimientos =
+            JSON.parse(localStorage.getItem("historialMovimientos")) || [];
+          historialMovimientos.push({
+            tipo: "venta",
+            nombre: this.selectedCrypto,
+            precio: this.precioTotal,
+            cantidad: this.amount,
+            fecha: ventaData.datetime,
+          });
+          localStorage.setItem(
+            "historialMovimientos",
+            JSON.stringify(historialMovimientos)
+          );
+
+          // Restar de la cantidad disponible
+          const crypto = this.criptomonedasDisponibles.find(
+            (c) => c.id === this.selectedCrypto
+          );
+          if (crypto) crypto.cantidad -= this.amount;
+
+          // Resetear valores
+          this.selectedCrypto = "";
+          this.amount = 0;
+          this.valorCrypto = null;
+          this.precioTotal = null;
         } catch (error) {
           Swal.fire({
             icon: "error",
@@ -153,36 +204,10 @@ export default {
 </script>
 
 <style scoped>
+/* Agregar estilos aquí, similares a los de CompraCripto.vue */
 .VentaCripto {
   text-align: center;
   margin: 20px;
-}
-
-.home-icon {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  display: flex;
-  align-items: center;
-}
-
-.home-link {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: black;
-  transition: color 0.3s, transform 0.3s;
-}
-
-.home-link:hover {
-  color: #007acc;
-  transform: scale(1.1);
-}
-
-.home-svg {
-  width: 24px;
-  height: 24px;
-  margin-right: 8px;
 }
 
 .crypto-select,
@@ -190,17 +215,23 @@ export default {
   margin: 10px 0;
 }
 
+.crypto-value {
+  margin: 10px 0;
+  font-size: 1.2em;
+  color: #007acc;
+}
+
 .crypto-price {
   margin: 20px 0;
   font-size: 1.2em;
-  color: #333;
+  color: #003366;
 }
 
 button {
   margin-top: 20px;
   padding: 10px 20px;
   font-size: 16px;
-  background-color: #f44336;
+  background-color: #ff5722;
   color: white;
   border: none;
   border-radius: 5px;
@@ -208,6 +239,6 @@ button {
 }
 
 button:hover {
-  background-color: #e53935;
+  background-color: #e64a19;
 }
 </style>

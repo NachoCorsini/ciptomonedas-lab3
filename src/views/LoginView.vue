@@ -96,7 +96,7 @@ export default {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #f4f4f9;
+ 
 }
 
 /* Caja del formulario */
@@ -166,7 +166,7 @@ button:hover {
 
 /* Mensaje de error */
 .error-message {
-  color: red;
+  color: rgb(250, 250, 250);
   font-size: 12px;
   margin-top: 10px;
 }

@@ -1,128 +1,134 @@
 <template>
-  <div class="historial">
-    <!-- Icono y texto de Home -->
-    <div class="home-icon">
-      <router-link to="/HomeView" class="home-link">
-        <span class="icon">
-          <!-- Ícono SVG de casa -->
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="home-svg"
-          >
-            <path d="M3 9l9-7 9 7" />
-            <path d="M9 22V12h6v10" />
-          </svg>
-        </span>
-        <span class="text">Home</span>
-      </router-link>
-    </div>
-
+  <div>
     <h1>Historial de Movimientos</h1>
-    <table>
-      <thead>
-        <tr>
-          <th>Tipo</th>
-          <th>Criptomoneda</th>
-          <th>Precio</th>
-          <th>Cantidad</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="(movimiento, index) in movimientos"
-          :key="index"
-          :class="{
-            compra: movimiento.tipo === 'compra',
-            venta: movimiento.tipo === 'venta',
-          }"
-        >
-          <td>{{ movimiento.tipo }}</td>
-          <td>{{ movimiento.nombre }}</td>
-          <td>{{ movimiento.precio }}</td>
-          <td>{{ movimiento.cantidad }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div v-if="transactions.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th>Crypto</th>
+            <th>Cantidad</th>
+            <th>Dinero</th>
+            <th>Acción</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="transaction in transactions" :key="transaction._id">
+            <td>{{ transaction.crypto_code }}</td>
+            <td>{{ transaction.crypto_amount }}</td>
+            <td>{{ transaction.money }}</td>
+            <td>
+              {{ transaction.action === "purchase" ? "Compra" : "Venta" }}
+            </td>
+            <td>{{ new Date(transaction.datetime).toLocaleString() }}</td>
+            <td>
+              <button @click="verTransaccion(transaction._id)">Ver</button>
+              <button @click="editarTransaccion(transaction._id)">
+                Editar
+              </button>
+              <button @click="eliminarTransaccion(transaction._id)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div v-else>
+      <p>No hay movimientos registrados.</p>
+    </div>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
-  name: "HistorialMovs",
+    name: 'HistorialMovs',
+    
   data() {
     return {
-      movimientos: [], // Lista de movimientos (compra/venta)
+      transactions: [],
+      userId: "", // Aquí deberías almacenar el user_id desde el login
     };
   },
   mounted() {
-    // Obtener movimientos del LocalStorage
-    const data = JSON.parse(localStorage.getItem("historialMovimientos")) || [];
-    this.movimientos = data;
+    this.userId = localStorage.getItem("user_id"); // Obtener el user_id desde el localStorage
+    this.obtenerMovimientos();
+  },
+  methods: {
+    async obtenerMovimientos() {
+      try {
+        const response = await axios.get(
+          `https://laboratorio3-f36a.restdb.io/rest/transactions?q={"user_id":"${this.userId}"}`
+        );
+        this.transactions = response.data;
+      } catch (error) {
+        console.error("Error al obtener las transacciones:", error);
+      }
+    },
+    async verTransaccion(id) {
+      try {
+        const response = await axios.get(
+          `https://laboratorio3-f36a.restdb.io/rest/transactions/${id}`
+        );
+        console.log("Detalles de la transacción:", response.data);
+        // Puedes abrir una nueva vista o mostrar un modal con la información
+      } catch (error) {
+        console.error(
+          "Error al obtener los detalles de la transacción:",
+          error
+        );
+      }
+    },
+    async editarTransaccion(id) {
+      const nuevoMonto = prompt("Ingrese el nuevo monto:");
+      if (nuevoMonto) {
+        try {
+          await axios.patch(
+            `https://laboratorio3-f36a.restdb.io/rest/transactions/${id}`,
+            { money: nuevoMonto }
+          );
+          alert("Transacción actualizada");
+          this.obtenerMovimientos();
+        } catch (error) {
+          console.error("Error al editar la transacción:", error);
+        }
+      }
+    },
+    async eliminarTransaccion(id) {
+      if (confirm("¿Estás seguro de que deseas eliminar esta transacción?")) {
+        try {
+          await axios.delete(
+            `https://laboratorio3-f36a.restdb.io/rest/transactions/${id}`
+          );
+          alert("Transacción eliminada");
+          this.obtenerMovimientos();
+        } catch (error) {
+          console.error("Error al eliminar la transacción:", error);
+        }
+      }
+    },
   },
 };
 </script>
 
 <style scoped>
-.historial {
-  text-align: center;
-  margin: 20px;
-}
-
-/* Estilos para el icono Home */
-.home-icon {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  display: flex;
-  align-items: center;
-}
-
-.home-link {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: black;
-  transition: color 0.3s, transform 0.3s;
-}
-
-.home-link:hover {
-  color: #007acc;
-  transform: scale(1.1);
-}
-
-.home-svg {
-  width: 24px;
-  height: 24px;
-  margin-right: 8px;
-}
-
-/* Estilos para la tabla */
+/* Estilos básicos para la tabla */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin: 20px auto;
-}
-thead {
-  background-color: #f5f5f5;
-}
-th,
-td {
-  border: 1px solid #ddd;
-  padding: 8px;
 }
 
-.compra {
-  background-color: #e8f5e9; /* Verde claro */
-  color: #2e7d32;
+th,
+td {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  text-align: center;
 }
-.venta {
-  background-color: #ffebee; /* Rojo claro */
-  color: #c62828;
+
+button {
+  margin: 5px;
 }
 </style>

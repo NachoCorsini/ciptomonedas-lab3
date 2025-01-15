@@ -26,7 +26,7 @@
         <img src="../assets/transfercripto.jpg" alt="Estado de Criptomonedas" />
         <p>Visualiza el estado de tus criptos en tiempo real</p>
       </div>
-      <div class="feature" @click="navigateTo('PortfolioCripto')">
+      <div class="feature" @click="navigateTo('EstadoCripto')">
         <img src="../assets/portfoliocripto.jpg" alt="Historial de Movimientos" />
         <p>Observa todos tus movimientos de compra y venta</p>
       </div>

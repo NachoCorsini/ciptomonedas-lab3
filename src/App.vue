@@ -4,15 +4,18 @@
       <router-link to="/"></router-link>
       <router-link to="/HomeView"></router-link>
       <router-link to="/CompraCripto"></router-link>
+      <router-link to="/VentaCripto"></router-link>
       <router-link to="/HistorialMovs"></router-link>
+      
     </nav>
     <router-view></router-view>
   </div>
 </template>
 
 <script>
+
 export default {
-  name: 'App',
+  name: "App",
 };
 </script>
 
@@ -22,7 +25,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: Arial, sans-serif;
-  background: linear-gradient(to right, #efefef, #85fdcb); /* Fondo en degradé de negro a amarillo */
+  background: linear-gradient(to right, #efefef, #85fdcb);
   min-height: 100vh;
   color: #0b0b0b; /* Texto en blanco para resaltar con el fondo */
 }
