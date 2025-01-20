@@ -11,9 +11,9 @@
           required
         >
           <option value="" disabled>Selecciona una criptomoneda</option>
-          <option value="usdc">USDC</option>
-          <option value="bitcoin">Bitcoin</option>
           <option value="eth">Ethereum</option>
+          <option value="dai">Dai</option>
+          <option value="usdt">Tether</option>
         </select>
       </div>
       <div v-if="precioActual">
@@ -54,7 +54,7 @@
 <script>
 import axios from "axios";
 import Swal from "sweetalert2";
-import dayjs from "dayjs"; // Librería para manejar fechas
+import dayjs from "dayjs";
 
 export default {
   name: "CompraCripto",
@@ -62,7 +62,7 @@ export default {
     return {
       precioActual: null,
       compra: {
-        user_id: this.$store.getters.getUserId || "default_user", // Reemplazar por usuario logueado
+        user_id: this.$store.getters.getUserId || "default_user",
         action: "purchase",
         crypto_code: "",
         crypto_amount: null,
@@ -83,12 +83,11 @@ export default {
         const response = await axios.get(
           `https://criptoya.com/api/argenbtc/${this.compra.crypto_code}/ars`
         );
-        this.precioActual = response.data.ask; // Precio actual
-        this.calcularMontoPagado(); // Recalcular el monto total
+        this.precioActual = response.data.ask;
+        this.calcularMontoPagado();
       } catch (error) {
         console.error("Error al obtener el precio:", error);
         this.precioActual = null;
-        this.compra.money = null;
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -106,7 +105,6 @@ export default {
       }
     },
     async registrarCompra() {
-      // Validar datos ingresados
       if (
         !this.compra.crypto_code ||
         this.compra.crypto_amount <= 0 ||
@@ -121,7 +119,6 @@ export default {
         return;
       }
 
-      // Validar fecha
       const fechaIngresada = dayjs(this.compra.datetime);
       const fechaActual = dayjs();
       if (fechaIngresada.isAfter(fechaActual)) {
@@ -133,24 +130,29 @@ export default {
         return;
       }
 
-      // Formatear la fecha al formato "DD-MM-YYYY hh:mm"
-      const fechaFormateada = fechaIngresada.format("DD-MM-YYYY HH:mm");
-
-      const datosCompra = {
-        ...this.compra,
-        datetime: fechaFormateada,
-      };
+      const datosCompra = { ...this.compra };
 
       try {
-        // Realizar la solicitud POST
         await axios.post(
           "https://laboratorio3-f36a.restdb.io/rest/transactions",
           datosCompra,
           {
-            headers: {
-              "x-apikey": "60eb09146661365596af552f",
-            },
+            headers: { "x-apikey": "60eb09146661365596af552f" },
           }
+        );
+
+        const historialMovimientos =
+          JSON.parse(localStorage.getItem("historialMovimientos")) || [];
+        historialMovimientos.push({
+          tipo: "compra",
+          nombre: this.compra.crypto_code,
+          cantidad: this.compra.crypto_amount,
+          precio: this.compra.money,
+          fecha: datosCompra.datetime,
+        });
+        localStorage.setItem(
+          "historialMovimientos",
+          JSON.stringify(historialMovimientos)
         );
 
         Swal.fire({
@@ -159,7 +161,6 @@ export default {
           text: "La compra ha sido registrada exitosamente.",
         });
 
-        // Limpiar el formulario
         this.compra = {
           user_id: this.$store.getters.getUserId || "default_user",
           action: "purchase",
@@ -170,8 +171,7 @@ export default {
         };
         this.precioActual = null;
 
-        // Redireccionar al historial
-        this.$router.push("/HistorialMovs");
+        this.$router.push("/HomeView");
       } catch (error) {
         console.error("Error al registrar la compra:", error);
         Swal.fire({
