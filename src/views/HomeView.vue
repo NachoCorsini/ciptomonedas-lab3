@@ -3,8 +3,8 @@
     <!-- Sección superior con el ID y el email del usuario -->
     <div class="user-info">
       <span class="user-details">
-        <span>ID: {{ userId }}</span>
-        <span>Email: {{ userEmail }}</span>
+        <span>ID: <strong>{{ userId }}</strong></span>
+        <span class="espacio">Email: <strong>{{ userEmail }}</strong></span>
       </span>
       <button class="logout-btn" @click="logout">Salir</button>
     </div>
@@ -35,6 +35,8 @@
 </template>
 
 <script>
+import Swal from 'sweetalert2';
+
 export default {
   name: 'HomeView',
   data() {
@@ -44,22 +46,36 @@ export default {
     };
   },
   mounted() {
-    // Obtener datos del usuario desde Vuex o localStorage
     const user = JSON.parse(localStorage.getItem('user')) || {};
     this.userId = user.id || 'No disponible';
     this.userEmail = user.email || 'No disponible';
   },
   methods: {
     navigateTo(routename) {
-      // Redirige a la página específica según el nombre de la ruta
       this.$router.push({ name: routename });
     },
     logout() {
-      // Eliminar los datos del usuario en localStorage
-      localStorage.removeItem('user');
-      
-      // Redirigir a la vista de login
-      this.$router.push({ name: 'LoginView' });
+      Swal.fire({
+        title: '¿Cerrar sesión?',
+        text: '¿Estás seguro de que querés salir?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, salir',
+        cancelButtonText: 'Cancelar',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          localStorage.clear();
+          this.$store.dispatch('saveUserId', null);
+          this.$store.dispatch('saveUserEmail', null);
+          Swal.fire({
+            icon: 'success',
+            title: 'Sesión cerrada',
+            showConfirmButton: false,
+            timer: 1200
+          });
+          this.$router.push({ name: 'LoginView' });
+        }
+      });
     },
   },
 };
@@ -126,8 +142,18 @@ p {
 }
 
 .user-details {
-  font-size: 0.9em; /* Más pequeño */
+  font-size: 0.9em;
   color: #333;
+  display: flex;
+  gap: 20px;
+}
+
+.user-details span {
+  white-space: nowrap;
+}
+
+.espacio {
+  margin-left: 10px;
 }
 
 .logout-btn {
@@ -137,7 +163,7 @@ p {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 0.8em; /* Más pequeño */
+  font-size: 0.8em;
 }
 
 .logout-btn:hover {
