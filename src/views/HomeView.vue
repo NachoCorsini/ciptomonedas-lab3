@@ -3,15 +3,22 @@
     <!-- Sección superior con el ID y el email del usuario -->
     <div class="user-info">
       <span class="user-details">
-        <span>ID: <strong>{{ userId }}</strong></span>
-        <span class="espacio">Email: <strong>{{ userEmail }}</strong></span>
+        <span
+          >ID: <strong>{{ userId }}</strong></span
+        >
+        <span class="espacio"
+          >Email: <strong>{{ userEmail }}</strong></span
+        >
       </span>
       <button class="logout-btn" @click="logout">Salir</button>
     </div>
-    
+
     <h1>Bienvenido a Krustywallet</h1>
-    <p>Tu billetera digital para administrar y comprar criptomonedas de forma segura.</p>
-    
+    <p>
+      Tu billetera digital para administrar y comprar criptomonedas de forma
+      segura.
+    </p>
+
     <!-- Sección de imágenes con epígrafes como botones -->
     <div class="features">
       <div class="feature" @click="navigateTo('CompraCripto')">
@@ -27,28 +34,35 @@
         <p>Visualiza el estado de tus criptos en tiempo real</p>
       </div>
       <div class="feature" @click="navigateTo('EstadoCripto')">
-        <img src="../assets/portfoliocripto.jpg" alt="Historial de Movimientos" />
+        <img
+          src="../assets/portfoliocripto.jpg"
+          alt="Historial de Movimientos"
+        />
         <p>Observa todos tus movimientos de compra y venta</p>
+      </div>
+      <div class="feature" @click="navigateTo('AnalisisInversion')">
+        <img src="../assets/analisisinversiones.jpg" alt="Análisis de Inversiones" />
+        <p>Descubrí el rendimiento de tus inversiones</p>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 export default {
-  name: 'HomeView',
+  name: "HomeView",
   data() {
     return {
-      userId: '',
-      userEmail: '',
+      userId: "",
+      userEmail: "",
     };
   },
   mounted() {
-    const user = JSON.parse(localStorage.getItem('user')) || {};
-    this.userId = user.id || 'No disponible';
-    this.userEmail = user.email || 'No disponible';
+    const user = JSON.parse(localStorage.getItem("user")) || {};
+    this.userId = user.id || "No disponible";
+    this.userEmail = user.email || "No disponible";
   },
   methods: {
     navigateTo(routename) {
@@ -56,24 +70,24 @@ export default {
     },
     logout() {
       Swal.fire({
-        title: '¿Cerrar sesión?',
-        text: '¿Estás seguro de que querés salir?',
-        icon: 'warning',
+        title: "¿Cerrar sesión?",
+        text: "¿Estás seguro de que querés salir?",
+        icon: "warning",
         showCancelButton: true,
-        confirmButtonText: 'Sí, salir',
-        cancelButtonText: 'Cancelar',
+        confirmButtonText: "Sí, salir",
+        cancelButtonText: "Cancelar",
       }).then((result) => {
         if (result.isConfirmed) {
           localStorage.clear();
-          this.$store.dispatch('saveUserId', null);
-          this.$store.dispatch('saveUserEmail', null);
+          this.$store.dispatch("saveUserId", null);
+          this.$store.dispatch("saveUserEmail", null);
           Swal.fire({
-            icon: 'success',
-            title: 'Sesión cerrada',
+            icon: "success",
+            title: "Sesión cerrada",
             showConfirmButton: false,
-            timer: 1200
+            timer: 1200,
           });
-          this.$router.push({ name: 'LoginView' });
+          this.$router.push({ name: "LoginView" });
         }
       });
     },

@@ -4,6 +4,8 @@ import HomeView from '@/views/HomeView.vue'
 import CompraCripto from '@/views/CompraCripto.vue'
 import VentaCripto from '@/views/VentaCripto.vue'
 import HistorialMovs from '@/views/HistorialMovs.vue'
+import EstadoCripto from '@/views/EstadoCripto.vue'
+import AnalisisInversion from '@/views/AnalisisInversion.vue'
 
 // eslint-disable-next-line no-unused-vars
 
@@ -34,6 +36,16 @@ const routes = [
     path: '/HistorialMovs',
     name: 'HistorialMovs',
     component: HistorialMovs,
+  },
+  {
+    path: '/EstadoCripto',
+    name: 'EstadoCripto',
+    component:EstadoCripto,
+  },
+  {
+    path: '/AnalisisInversion',
+    name: 'AnalisisInversion',
+    component: AnalisisInversion,
   },
   
   
