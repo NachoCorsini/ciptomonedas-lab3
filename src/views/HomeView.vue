@@ -1,23 +1,10 @@
 <template>
-  <div>
-    <!-- Sección superior con el ID y el email del usuario -->
-    <div class="user-info">
-      <span class="user-details">
-        <span
-          >ID: <strong>{{ userId }}</strong></span
-        >
-        <span class="espacio"
-          >Email: <strong>{{ userEmail }}</strong></span
-        >
-      </span>
-      <button class="logout-btn" @click="logout">Salir</button>
-    </div>
+  <div class="home">
+    <!-- Navbar reutilizable -->
+    <NavBar />
 
     <h1>Bienvenido a Krustywallet</h1>
-    <p>
-      Tu billetera digital para administrar y comprar criptomonedas de forma
-      segura.
-    </p>
+    <p>Tu billetera digital para administrar y comprar criptomonedas de forma segura.</p>
 
     <!-- Sección de imágenes con epígrafes como botones -->
     <div class="features">
@@ -34,10 +21,7 @@
         <p>Visualiza el estado de tus criptos en tiempo real</p>
       </div>
       <div class="feature" @click="navigateTo('EstadoCripto')">
-        <img
-          src="../assets/portfoliocripto.jpg"
-          alt="Historial de Movimientos"
-        />
+        <img src="../assets/portfoliocripto.jpg" alt="Historial de Movimientos" />
         <p>Observa todos tus movimientos de compra y venta</p>
       </div>
       <div class="feature" @click="navigateTo('AnalisisInversion')">
@@ -49,49 +33,18 @@
 </template>
 
 <script>
-import Swal from "sweetalert2";
+import NavBar from '@/components/NavBar.vue';
 
 export default {
-  name: "HomeView",
-  data() {
-    return {
-      userId: "",
-      userEmail: "",
-    };
-  },
-  mounted() {
-    const user = JSON.parse(localStorage.getItem("user")) || {};
-    this.userId = user.id || "No disponible";
-    this.userEmail = user.email || "No disponible";
+  name: 'HomeView',
+  components: {
+    NavBar
   },
   methods: {
     navigateTo(routename) {
       this.$router.push({ name: routename });
-    },
-    logout() {
-      Swal.fire({
-        title: "¿Cerrar sesión?",
-        text: "¿Estás seguro de que querés salir?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Sí, salir",
-        cancelButtonText: "Cancelar",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          localStorage.clear();
-          this.$store.dispatch("saveUserId", null);
-          this.$store.dispatch("saveUserEmail", null);
-          Swal.fire({
-            icon: "success",
-            title: "Sesión cerrada",
-            showConfirmButton: false,
-            timer: 1200,
-          });
-          this.$router.push({ name: "LoginView" });
-        }
-      });
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -99,6 +52,7 @@ export default {
 .home {
   text-align: center;
   padding: 20px;
+  margin-top: 80px; /* para que no se tape con la navbar fija */
 }
 
 h1 {
@@ -144,43 +98,5 @@ p {
   font-size: 1em;
   color: #333;
   margin-top: 10px;
-}
-
-.user-info {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.user-details {
-  font-size: 0.9em;
-  color: #333;
-  display: flex;
-  gap: 20px;
-}
-
-.user-details span {
-  white-space: nowrap;
-}
-
-.espacio {
-  margin-left: 10px;
-}
-
-.logout-btn {
-  padding: 6px 12px;
-  background-color: #f44336;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.8em;
-}
-
-.logout-btn:hover {
-  background-color: #e53935;
 }
 </style>

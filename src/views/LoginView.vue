@@ -101,7 +101,7 @@ export default {
 
 /* Caja del formulario */
 .login-box {
-  background-image: url('../assets/krusty.png'); /* Reemplaza con la ruta de tu imagen */
+  background-image: url('../assets/krusty.png'); 
   background-size: cover;
   background-position: center;
   padding: 40px;

@@ -1,44 +1,55 @@
 <template>
-  <div class="VentaCripto">
-    <h1>Registrar Nueva Venta</h1>
-    <form @submit.prevent="confirmarVenta">
-      <div>
-        <label for="crypto">Criptomoneda:</label>
-        <select
-          v-model="venta.crypto_code"
-          id="crypto"
-          required
-          @change="calcularCantidadDisponible"
-        >
-          <option value="" disabled>Selecciona una criptomoneda</option>
-          <option value="eth">Ethereum</option>
-          <option value="dai">Dai</option>
-          <option value="usdt">Tether</option>
-        </select>
-      </div>
-      <div>
-        <label for="amount">Cantidad a Vender:</label>
-        <input
-          type="number"
-          v-model.number="venta.amount"
-          id="amount"
-          required
-          :max="cantidadDisponible"
-        />
-      </div>
-      <p v-if="cantidadDisponible !== null">
-        Cantidad disponible: {{ cantidadDisponible }}
-      </p>
-      <button type="submit">Registrar Venta</button>
-    </form>
+  <div>
+    <NavBar />
+
+    <div class="VentaCripto">
+      <h1>Registrar Nueva Venta</h1>
+      <form @submit.prevent="confirmarVenta">
+        <div>
+          <label for="crypto">Criptomoneda:</label>
+          <select
+            v-model="venta.crypto_code"
+            id="crypto"
+            required
+            @change="calcularCantidadDisponible"
+          >
+            <option value="" disabled>Selecciona una criptomoneda</option>
+            <option value="eth">Ethereum</option>
+            <option value="dai">Dai</option>
+            <option value="usdt">Tether</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="amount">Cantidad a Vender:</label>
+          <input
+            type="number"
+            v-model.number="venta.amount"
+            id="amount"
+            required
+            :max="cantidadDisponible"
+          />
+        </div>
+
+        <p v-if="cantidadDisponible !== null">
+          Cantidad disponible: {{ cantidadDisponible }}
+        </p>
+
+        <button type="submit">Registrar Venta</button>
+      </form>
+    </div>
   </div>
 </template>
 
 <script>
 import Swal from "sweetalert2";
+import NavBar from "@/components/NavBar.vue";
 
 export default {
   name: "VentaCripto",
+  components: {
+    NavBar
+  },
   data() {
     return {
       venta: {
@@ -113,7 +124,7 @@ export default {
 <style scoped>
 .VentaCripto {
   text-align: center;
-  margin: 20px;
+  margin: 100px auto 20px auto; /* espacio para no tapar la navbar */
 }
 
 form {

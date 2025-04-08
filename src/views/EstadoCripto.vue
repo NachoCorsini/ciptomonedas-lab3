@@ -1,7 +1,10 @@
 <template>
+  <div>
+    <NavBar />
+
     <div class="estado-cripto">
       <h1>Estado Actual de tus Criptomonedas</h1>
-  
+
       <table v-if="estado.length">
         <thead>
           <tr>
@@ -24,105 +27,109 @@
           </tr>
         </tfoot>
       </table>
-  
+
       <p v-else>Cargando datos...</p>
     </div>
-  </template>
-  
-  <script>
-  import axios from 'axios';
-  
-  export default {
-    name: 'EstadoCripto',
-    data() {
-      return {
-        estado: [],
-        total: 0,
-        userId: '',
-      };
-    },
-    async mounted() {
-      const user = JSON.parse(localStorage.getItem('user'));
-      this.userId = user?.id;
-  
-      if (this.userId) {
-        await this.cargarEstado();
-      }
-    },
-    methods: {
-      async cargarEstado() {
-        try {
-          // Obtener todas las transacciones del usuario
-          const response = await axios.get(`https://laboratorio3-f36a.restdb.io/rest/transactions?q={"user_id":"${this.userId}"}`, {
+  </div>
+</template>
+
+<script>
+import axios from 'axios';
+import NavBar from '@/components/NavBar.vue';
+
+export default {
+  name: 'EstadoCripto',
+  components: {
+    NavBar
+  },
+  data() {
+    return {
+      estado: [],
+      total: 0,
+      userId: '',
+    };
+  },
+  async mounted() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    this.userId = user?.id;
+
+    if (this.userId) {
+      await this.cargarEstado();
+    }
+  },
+  methods: {
+    async cargarEstado() {
+      try {
+        const response = await axios.get(
+          `https://laboratorio3-f36a.restdb.io/rest/transactions?q={"user_id":"${this.userId}"}`,
+          {
             headers: {
               'x-apikey': '60eb09146661365596af552f',
             },
-          });
-  
-          const transacciones = response.data;
-  
-          // Agrupar por criptomoneda
-          const resumen = {};
-          transacciones.forEach(tx => {
-            const code = tx.crypto_code.toLowerCase();
-            const amount = parseFloat(tx.crypto_amount);
-            if (!resumen[code]) resumen[code] = 0;
-            resumen[code] += tx.action === 'purchase' ? amount : -amount;
-          });
-  
-          // Consultar precios actuales y calcular valor
-          const estadoFinal = [];
-          let total = 0;
-  
-          for (const crypto in resumen) {
-            const cantidad = resumen[crypto];
-            if (cantidad <= 0) continue;
-  
-            const precioRes = await axios.get(`https://criptoya.com/api/satoshitango/${crypto}/ars`);
-            const precio = precioRes.data.totalBid;
-  
-            const valor = cantidad * precio;
-  
-            estadoFinal.push({
-              crypto,
-              amount: cantidad,
-              value: valor,
-            });
-  
-            total += valor;
           }
-  
-          this.estado = estadoFinal;
-          this.total = total;
-        } catch (error) {
-          console.error('Error cargando el estado:', error);
+        );
+
+        const transacciones = response.data;
+
+        const resumen = {};
+        transacciones.forEach(tx => {
+          const code = tx.crypto_code.toLowerCase();
+          const amount = parseFloat(tx.crypto_amount);
+          if (!resumen[code]) resumen[code] = 0;
+          resumen[code] += tx.action === 'purchase' ? amount : -amount;
+        });
+
+        const estadoFinal = [];
+        let total = 0;
+
+        for (const crypto in resumen) {
+          const cantidad = resumen[crypto];
+          if (cantidad <= 0) continue;
+
+          const precioRes = await axios.get(`https://criptoya.com/api/satoshitango/${crypto}/ars`);
+          const precio = precioRes.data.totalBid;
+
+          const valor = cantidad * precio;
+
+          estadoFinal.push({
+            crypto,
+            amount: cantidad,
+            value: valor,
+          });
+
+          total += valor;
         }
-      },
+
+        this.estado = estadoFinal;
+        this.total = total;
+      } catch (error) {
+        console.error('Error cargando el estado:', error);
+      }
     },
-  };
-  </script>
-  
-  <style scoped>
-  .estado-cripto {
-    max-width: 800px;
-    margin: auto;
-    text-align: center;
-    padding: 20px;
-  }
-  
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-  }
-  
-  th, td {
-    border: 1px solid #aaa;
-    padding: 10px;
-  }
-  
-  th {
-    background-color: #f4f4f4;
-  }
-  </style>
-  
+  },
+};
+</script>
+
+<style scoped>
+.estado-cripto {
+  max-width: 800px;
+  margin: 100px auto 20px auto; /* deja espacio arriba para el NavBar */
+  text-align: center;
+  padding: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  border: 1px solid #aaa;
+  padding: 10px;
+}
+
+th {
+  background-color: #f4f4f4;
+}
+</style>

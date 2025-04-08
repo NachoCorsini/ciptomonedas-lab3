@@ -1,43 +1,46 @@
 <template>
-  <div class="analisis-inversion">
-    <h1>Análisis de tus Inversiones</h1>
+  <div>
+    <NavBar />
 
-    <table v-if="resultados.length">
-      <thead>
-        <tr>
-          <th>Criptomoneda</th>
-          <th>Resultado</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="res in resultados" :key="res.crypto">
-          <td>{{ res.crypto.toUpperCase() }}</td>
-          <td
-            :class="{
-              positivo: res.resultado >= 0,
-              negativo: res.resultado < 0,
-            }"
-          >
-            $
-            {{
-              res.resultado.toLocaleString("es-AR", {
-                minimumFractionDigits: 2,
-              })
-            }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="analisis-inversion">
+      <h1>Análisis de tus Inversiones</h1>
 
-    <p v-else>Cargando datos de inversiones...</p>
+      <table v-if="resultados.length">
+        <thead>
+          <tr>
+            <th>Criptomoneda</th>
+            <th>Resultado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="res in resultados" :key="res.crypto">
+            <td>{{ res.crypto.toUpperCase() }}</td>
+            <td :class="{ positivo: res.resultado >= 0, negativo: res.resultado < 0 }">
+              $
+              {{
+                res.resultado.toLocaleString("es-AR", {
+                  minimumFractionDigits: 2,
+                })
+              }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p v-else>Cargando datos de inversiones...</p>
+    </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import NavBar from "@/components/NavBar.vue";
 
 export default {
   name: "AnalisisInversion",
+  components: {
+    NavBar,
+  },
   data() {
     return {
       resultados: [],
@@ -67,7 +70,6 @@ export default {
         const transacciones = res.data;
         const agrupado = {};
 
-        // Agrupar por criptomoneda
         transacciones.forEach((tx) => {
           const crypto = tx.crypto_code.toLowerCase();
           const amount = parseFloat(tx.crypto_amount);
@@ -126,7 +128,7 @@ export default {
 <style scoped>
 .analisis-inversion {
   max-width: 800px;
-  margin: auto;
+  margin: 80px auto 0 auto;
   text-align: center;
   padding: 20px;
 }

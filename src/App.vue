@@ -20,14 +20,14 @@ export default {
 </script>
 
 <style>
-/* Fondo general para toda la aplicación */
+
 body {
   margin: 0;
   padding: 0;
   font-family: Arial, sans-serif;
-  background: linear-gradient(to right, #efefef, #85fdcb);
+  background: linear-gradient(to right, #f6f6f6, #fff308);
   min-height: 100vh;
-  color: #0b0b0b; /* Texto en blanco para resaltar con el fondo */
+  color: #0b0b0b; 
 }
 
 #app {

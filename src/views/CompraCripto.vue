@@ -1,53 +1,62 @@
 <template>
-  <div class="CompraCripto">
-    <h1>Registrar Nueva Compra</h1>
-    <form @submit.prevent="registrarCompra">
-      <div>
-        <label for="crypto">Criptomoneda:</label>
-        <select
-          v-model="compra.crypto_code"
-          id="crypto"
-          @change="obtenerPrecio"
-          required
-        >
-          <option value="" disabled>Selecciona una criptomoneda</option>
-          <option value="eth">Ethereum</option>
-          <option value="dai">Dai</option>
-          <option value="usdt">Tether</option>
-        </select>
-      </div>
-      <div v-if="precioActual">
-        <p>
-          Precio actual de {{ compra.crypto_code.toUpperCase() }}:
-          {{ precioActual }} ARS
-        </p>
-      </div>
-      <div>
-        <label for="amount">Cantidad:</label>
-        <input
-          type="number"
-          step="0.00001"
-          v-model.number="compra.crypto_amount"
-          id="amount"
-          required
-          min="0.00001"
-          @input="calcularMontoPagado"
-        />
-      </div>
-      <div v-if="compra.money !== null">
-        <p>Monto total a pagar: {{ compra.money }} ARS</p>
-      </div>
-      <div>
-        <label for="datetime">Fecha y Hora:</label>
-        <input
-          type="datetime-local"
-          v-model="compra.datetime"
-          id="datetime"
-          required
-        />
-      </div>
-      <button type="submit">Registrar Compra</button>
-    </form>
+  <div>
+    <NavBar />
+
+    <div class="CompraCripto">
+      <h1>Registrar Nueva Compra</h1>
+      <form @submit.prevent="registrarCompra">
+        <div>
+          <label for="crypto">Criptomoneda:</label>
+          <select
+            v-model="compra.crypto_code"
+            id="crypto"
+            @change="obtenerPrecio"
+            required
+          >
+            <option value="" disabled>Selecciona una criptomoneda</option>
+            <option value="eth">Ethereum</option>
+            <option value="dai">Dai</option>
+            <option value="usdt">Tether</option>
+          </select>
+        </div>
+
+        <div v-if="precioActual">
+          <p>
+            Precio actual de {{ compra.crypto_code.toUpperCase() }}:
+            {{ precioActual }} ARS
+          </p>
+        </div>
+
+        <div>
+          <label for="amount">Cantidad:</label>
+          <input
+            type="number"
+            step="0.00001"
+            v-model.number="compra.crypto_amount"
+            id="amount"
+            required
+            min="0.00001"
+            @input="calcularMontoPagado"
+          />
+        </div>
+
+        <div v-if="compra.money !== null">
+          <p>Monto total a pagar: {{ compra.money }} ARS</p>
+        </div>
+
+        <div>
+          <label for="datetime">Fecha y Hora:</label>
+          <input
+            type="datetime-local"
+            v-model="compra.datetime"
+            id="datetime"
+            required
+          />
+        </div>
+
+        <button type="submit">Registrar Compra</button>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -55,9 +64,13 @@
 import axios from "axios";
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
+import NavBar from "@/components/NavBar.vue";
 
 export default {
   name: "CompraCripto",
+  components: {
+    NavBar
+  },
   data() {
     return {
       precioActual: null,
@@ -188,7 +201,7 @@ export default {
 <style scoped>
 .CompraCripto {
   text-align: center;
-  margin: 20px;
+  margin: 100px auto 20px auto; /* para no tapar la navbar */
 }
 
 form {
