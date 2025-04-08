@@ -54,7 +54,7 @@
           />
         </div>
 
-        <button type="submit">Registrar Compra</button>
+        <button type="submit">Comprar</button>
       </form>
     </div>
   </div>

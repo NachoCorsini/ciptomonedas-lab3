@@ -35,7 +35,7 @@
           Cantidad disponible: {{ cantidadDisponible }}
         </p>
 
-        <button type="submit">Registrar Venta</button>
+        <button type="submit">Vender</button>
       </form>
     </div>
   </div>
