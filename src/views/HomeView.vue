@@ -18,11 +18,11 @@
       </div>
       <div class="feature" @click="navigateTo('HistorialMovs')">
         <img src="../assets/transfercripto.jpg" alt="Estado de Criptomonedas" />
-        <p>Visualiza el estado de tus criptos en tiempo real</p>
+        <p>Observa todos tus movimientos de compra y venta</p>
       </div>
       <div class="feature" @click="navigateTo('EstadoCripto')">
         <img src="../assets/portfoliocripto.jpg" alt="Historial de Movimientos" />
-        <p>Observa todos tus movimientos de compra y venta</p>
+        <p>Visualiza el estado de tus criptos en tiempo real</p>
       </div>
       <div class="feature" @click="navigateTo('AnalisisInversion')">
         <img src="../assets/analisisinversiones.jpg" alt="Análisis de Inversiones" />

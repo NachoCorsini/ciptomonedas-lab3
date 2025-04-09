@@ -1,13 +1,21 @@
 <template>
   <div class="login-container">
-    <div class="login-box animate__animated animate__fadeInDown">
-      <h2>Iniciar sesión</h2>
+    <div class="login-box">
+      
+      <!-- Imagen -->
+      <img
+        src="@/assets/krusty.jpg"
+        alt="Krusty Logo"
+        class="login-logo"
+      />
+
+      <!-- Texto animado -->
+      <h2 class="animated-text">¡Bienvenido a KrustyWallet!</h2>
 
       <div class="input-group">
         <label for="email">Correo electrónico:</label>
         <input v-model="userEmail" type="email" id="email" placeholder="Introduce tu email" required />
       </div>
-
       <div class="input-group">
         <label for="password">Contraseña:</label>
         <input v-model="userPassword" type="password" id="password" placeholder="Introduce tu contraseña" required />
@@ -18,10 +26,8 @@
       <p v-if="error" class="error-message">{{ error }}</p>
 
       <div v-if="userEmail && userId" class="user-info">
-        <span class="user-details">
-          <span>ID: {{ userId }}</span>
-          <span>Email: {{ userEmail }}</span>
-        </span>
+        <span>ID: {{ userId }}</span>
+        <span>Email: {{ userEmail }}</span>
       </div>
     </div>
   </div>
@@ -32,7 +38,6 @@ import { mapActions } from 'vuex';
 import Swal from 'sweetalert2';
 
 export default {
-  name: "LoginView",
   data() {
     return {
       userEmail: '',
@@ -43,7 +48,6 @@ export default {
   },
   methods: {
     ...mapActions(['saveUserId', 'saveUserEmail']),
-
     async handleLogin() {
       if (!this.userEmail || !this.userPassword) {
         this.error = 'Por favor, ingresa ambos campos.';
@@ -53,13 +57,7 @@ export default {
       const newId = this.generateRandomId();
       this.saveUserId(newId);
       this.saveUserEmail(this.userEmail);
-
-      const user = {
-        id: newId,
-        email: this.userEmail,
-        password: this.userPassword,
-      };
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('user', JSON.stringify({ id: newId, email: this.userEmail, password: this.userPassword }));
 
       await Swal.fire({
         title: 'Bienvenido',
@@ -70,43 +68,52 @@ export default {
 
       this.$router.push('/HomeView');
     },
-
     generateRandomId(length = 8) {
       const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      let result = '';
-      for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return result;
+      return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
     },
   },
 };
 </script>
 
 <style scoped>
-@import "https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css";
-
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(to right, #fff0f5, #fcbab2);
-  padding: 20px;
 }
 
 .login-box {
-  background: #ffffff;
-  padding: 35px;
+  background-color: white;
+  padding: 40px 30px;
   border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   width: 340px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
   text-align: center;
 }
 
-h2 {
+/* Nueva imagen */
+.login-logo {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  margin-bottom: 10px;
+  border: 2px solid #ccc;
+}
+
+/* Texto animado */
+.animated-text {
+  color: #333;
+  font-size: 20px;
   margin-bottom: 20px;
-  color: #222;
+  animation: floatText 3s ease-in-out infinite;
+}
+
+@keyframes floatText {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
 }
 
 .input-group {
@@ -116,25 +123,21 @@ h2 {
 
 .input-group label {
   font-size: 14px;
-  display: block;
-  color: #444;
   margin-bottom: 5px;
+  display: block;
+  color: #555;
 }
 
 input {
   width: 100%;
   padding: 10px;
-  border-radius: 6px;
   border: 1px solid #ccc;
-  outline: none;
-}
-
-input:focus {
-  border-color: #ff7f8f;
+  border-radius: 6px;
+  font-size: 14px;
 }
 
 button {
-  background-color: #ff6e7f;
+  background-color:rgb(37, 157, 10);
   color: white;
   padding: 12px;
   border: none;
@@ -145,23 +148,18 @@ button {
 }
 
 button:hover {
-  background-color: #f1546a;
+  background-color:rgb(131, 239, 158);
 }
 
 .error-message {
-  color: #d32f2f;
+  color: red;
   font-size: 13px;
   margin-top: 10px;
 }
 
 .user-info {
-  margin-top: 20px;
+  margin-top: 15px;
   font-size: 12px;
-  color: #555;
-}
-
-.user-details span {
-  display: block;
-  margin-top: 5px;
+  color: #444;
 }
 </style>

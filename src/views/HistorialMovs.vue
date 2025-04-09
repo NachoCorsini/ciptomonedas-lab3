@@ -12,16 +12,22 @@
             <th>Cantidad</th>
             <th>Precio</th>
             <th>Fecha</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(mov, index) in historial" :key="index">
-            <td>{{ mov.tipo }}</td>
-            <td>{{ mov.nombre }}</td>
-            <td>{{ mov.cantidad }}</td>
-            <td v-if="mov.tipo === 'compra'">{{ mov.precio }}</td>
+            <td>{{ mov.action }}</td>
+            <td>{{ mov.crypto_code.toUpperCase() }}</td>
+            <td>{{ mov.crypto_amount }}</td>
+            <td v-if="mov.action === 'purchase'">${{ mov.money }}</td>
             <td v-else>-</td>
-            <td>{{ mov.fecha }}</td>
+            <td>{{ mov.datetime }}</td>
+            <td>
+              <button @click="verDetalle(mov._id)">🔍</button>
+              <button @click="editarTransaccion(mov._id)">✏️</button>
+              <button @click="eliminarTransaccion(mov._id)">🗑️</button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -31,40 +37,126 @@
 
 <script>
 import NavBar from '@/components/NavBar.vue';
+import axios from 'axios';
+import Swal from 'sweetalert2';
 
 export default {
   name: "HistorialMovs",
-  components: {
-    NavBar
-  },
+  components: { NavBar },
   data() {
     return {
-      historial: JSON.parse(localStorage.getItem("historialMovimientos")) || [],
+      historial: [],
+      apiKey: '60eb09146661365596af552f',
     };
   },
+  mounted() {
+    this.cargarHistorial();
+  },
+  methods: {
+    async cargarHistorial() {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user?.id) return;
+
+      const res = await axios.get(
+        `https://laboratorio3-f36a.restdb.io/rest/transactions?q={"user_id":"${user.id}"}`,
+        { headers: { 'x-apikey': this.apiKey } }
+      );
+      this.historial = res.data;
+    },
+
+    async verDetalle(id) {
+      const res = await axios.get(
+        `https://laboratorio3-f36a.restdb.io/rest/transactions/${id}`,
+        { headers: { 'x-apikey': this.apiKey } }
+      );
+
+      const tx = res.data;
+      Swal.fire({
+        title: 'Detalle de transacción',
+        html: `
+          <p><b>Tipo:</b> ${tx.action}</p>
+          <p><b>Criptomoneda:</b> ${tx.crypto_code}</p>
+          <p><b>Cantidad:</b> ${tx.crypto_amount}</p>
+          <p><b>Monto ARS:</b> $${tx.money}</p>
+          <p><b>Fecha:</b> ${tx.datetime}</p>
+        `,
+        icon: 'info'
+      });
+    },
+
+    async editarTransaccion(id) {
+      const { value: nuevoMonto } = await Swal.fire({
+        title: 'Editar monto',
+        input: 'number',
+        inputLabel: 'Nuevo monto ARS',
+        inputPlaceholder: 'Ingresá el nuevo valor',
+        showCancelButton: true,
+        confirmButtonText: 'Guardar'
+      });
+
+      if (nuevoMonto) {
+        await axios.patch(
+          `https://laboratorio3-f36a.restdb.io/rest/transactions/${id}`,
+          { money: nuevoMonto.toString() },
+          { headers: { 'x-apikey': this.apiKey } }
+        );
+
+        Swal.fire('Actualizado', 'El monto fue actualizado.', 'success');
+        this.cargarHistorial();
+      }
+    },
+
+    async eliminarTransaccion(id) {
+      const confirm = await Swal.fire({
+        title: '¿Eliminar transacción?',
+        text: 'Esta acción no se puede deshacer.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      });
+
+      if (confirm.isConfirmed) {
+        await axios.delete(
+          `https://laboratorio3-f36a.restdb.io/rest/transactions/${id}`,
+          { headers: { 'x-apikey': this.apiKey } }
+        );
+        Swal.fire('Eliminada', 'La transacción fue eliminada.', 'success');
+        this.cargarHistorial();
+      }
+    }
+  }
 };
 </script>
 
 <style scoped>
 .HistorialMovimientos {
-  margin: 100px auto 20px auto; /* espacio arriba por la navbar */
+  margin: 100px auto 20px auto;
   text-align: center;
 }
 
 table {
   margin: 0 auto;
   border-collapse: collapse;
-  width: 80%;
+  width: 90%;
 }
 
 table th,
 table td {
   border: 1px solid #ddd;
-  padding: 8px;
+  padding: 10px;
 }
 
 table th {
   background-color: #f2f2f2;
   font-weight: bold;
+}
+
+button {
+  margin: 0 4px;
+  cursor: pointer;
+  font-size: 16px;
+  border: none;
+  background: none;
 }
 </style>
