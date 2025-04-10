@@ -7,12 +7,7 @@
       <form @submit.prevent="registrarCompra">
         <div>
           <label for="crypto">Criptomoneda:</label>
-          <select
-            v-model="compra.crypto_code"
-            id="crypto"
-            @change="obtenerPrecio"
-            required
-          >
+          <select v-model="compra.crypto_code" id="crypto" @change="obtenerPrecio" required>
             <option value="" disabled>Selecciona una criptomoneda</option>
             <option value="eth">Ethereum</option>
             <option value="dai">Dai</option>
@@ -21,21 +16,18 @@
         </div>
 
         <div v-if="precioActual">
-          <p>
-            Precio actual de {{ compra.crypto_code.toUpperCase() }}:
-            {{ precioActual }} ARS
-          </p>
+          <p>Precio actual de {{ compra.crypto_code.toUpperCase() }}: {{ precioActual }} ARS</p>
         </div>
 
         <div>
           <label for="amount">Cantidad:</label>
           <input
             type="number"
-            step="0.00001"
+            step="0.00000001"
+            min="0.00000001"
             v-model.number="compra.crypto_amount"
             id="amount"
             required
-            min="0.00001"
             @input="calcularMontoPagado"
           />
         </div>
@@ -45,12 +37,11 @@
         </div>
 
         <div>
-          <label for="datetime">Fecha y Hora:</label>
+          <label>Fecha y Hora:</label>
           <input
             type="datetime-local"
-            v-model="compra.datetime"
-            id="datetime"
-            required
+            :value="compra.datetime"
+            disabled
           />
         </div>
 
@@ -68,9 +59,7 @@ import NavBar from "@/components/NavBar.vue";
 
 export default {
   name: "CompraCripto",
-  components: {
-    NavBar
-  },
+  components: { NavBar },
   data() {
     return {
       precioActual: null,
@@ -80,118 +69,39 @@ export default {
         crypto_code: "",
         crypto_amount: null,
         money: null,
-        datetime: "",
+        datetime: dayjs().format("YYYY-MM-DDTHH:mm"),
       },
     };
   },
   methods: {
     async obtenerPrecio() {
-      if (!this.compra.crypto_code) {
-        this.precioActual = null;
-        this.compra.money = null;
-        return;
-      }
-
       try {
-        const response = await axios.get(
-          `https://criptoya.com/api/argenbtc/${this.compra.crypto_code}/ars`
-        );
-        this.precioActual = response.data.ask;
+        const res = await axios.get(`https://criptoya.com/api/argenbtc/${this.compra.crypto_code}/ars`);
+        this.precioActual = res.data.ask;
         this.calcularMontoPagado();
-      } catch (error) {
-        console.error("Error al obtener el precio:", error);
+      } catch (err) {
         this.precioActual = null;
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "No se pudo obtener el precio actual de la criptomoneda.",
-        });
+        Swal.fire("Error", "No se pudo obtener el precio actual", "error");
       }
     },
     calcularMontoPagado() {
       if (this.precioActual && this.compra.crypto_amount > 0) {
-        this.compra.money = (
-          this.precioActual * this.compra.crypto_amount
-        ).toFixed(2);
+        this.compra.money = (this.precioActual * this.compra.crypto_amount).toFixed(2);
       } else {
         this.compra.money = null;
       }
     },
     async registrarCompra() {
-      if (
-        !this.compra.crypto_code ||
-        this.compra.crypto_amount <= 0 ||
-        !this.compra.money ||
-        !this.compra.datetime
-      ) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Todos los campos deben estar correctamente llenos.",
-        });
-        return;
-      }
-
-      const fechaIngresada = dayjs(this.compra.datetime);
-      const fechaActual = dayjs();
-      if (fechaIngresada.isAfter(fechaActual)) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "La fecha no puede ser futura.",
-        });
-        return;
-      }
-
-      const datosCompra = { ...this.compra };
-
+      const datos = { ...this.compra };
       try {
-        await axios.post(
-          "https://laboratorio3-f36a.restdb.io/rest/transactions",
-          datosCompra,
-          {
-            headers: { "x-apikey": "60eb09146661365596af552f" },
-          }
-        );
-
-        const historialMovimientos =
-          JSON.parse(localStorage.getItem("historialMovimientos")) || [];
-        historialMovimientos.push({
-          tipo: "compra",
-          nombre: this.compra.crypto_code,
-          cantidad: this.compra.crypto_amount,
-          precio: this.compra.money,
-          fecha: datosCompra.datetime,
-        });
-        localStorage.setItem(
-          "historialMovimientos",
-          JSON.stringify(historialMovimientos)
-        );
-
-        Swal.fire({
-          icon: "success",
-          title: "Compra Registrada",
-          text: "La compra ha sido registrada exitosamente.",
+        await axios.post("https://laboratorio3-f36a.restdb.io/rest/transactions", datos, {
+          headers: { "x-apikey": "60eb09146661365596af552f" },
         });
 
-        this.compra = {
-          user_id: this.$store.getters.getUserId || "default_user",
-          action: "purchase",
-          crypto_code: "",
-          crypto_amount: null,
-          money: null,
-          datetime: "",
-        };
-        this.precioActual = null;
-
+        Swal.fire("Compra exitosa", "Se registró correctamente", "success");
         this.$router.push("/HomeView");
-      } catch (error) {
-        console.error("Error al registrar la compra:", error);
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Hubo un problema al registrar la compra. Intenta nuevamente.",
-        });
+      } catch (err) {
+        Swal.fire("Error", "No se pudo registrar la compra", "error");
       }
     },
   },
@@ -201,7 +111,7 @@ export default {
 <style scoped>
 .CompraCripto {
   text-align: center;
-  margin: 100px auto 20px auto; /* para no tapar la navbar */
+  margin: 100px auto 20px auto;
 }
 
 form {

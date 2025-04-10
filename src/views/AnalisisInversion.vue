@@ -20,6 +20,7 @@
               {{
                 res.resultado.toLocaleString("es-AR", {
                   minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
                 })
               }}
             </td>
@@ -38,9 +39,7 @@ import NavBar from "@/components/NavBar.vue";
 
 export default {
   name: "AnalisisInversion",
-  components: {
-    NavBar,
-  },
+  components: { NavBar },
   data() {
     return {
       resultados: [],
@@ -60,11 +59,7 @@ export default {
       try {
         const res = await axios.get(
           `https://laboratorio3-f36a.restdb.io/rest/transactions?q={"user_id":"${this.userId}"}`,
-          {
-            headers: {
-              "x-apikey": "60eb09146661365596af552f",
-            },
-          }
+          { headers: { "x-apikey": "60eb09146661365596af552f" } }
         );
 
         const transacciones = res.data;
@@ -128,7 +123,7 @@ export default {
 <style scoped>
 .analisis-inversion {
   max-width: 800px;
-  margin: 80px auto 0 auto;
+  margin: 100px auto 20px auto;
   text-align: center;
   padding: 20px;
 }
@@ -139,8 +134,7 @@ table {
   margin-top: 20px;
 }
 
-th,
-td {
+th, td {
   border: 1px solid #aaa;
   padding: 10px;
 }

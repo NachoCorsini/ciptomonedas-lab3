@@ -70,8 +70,8 @@ export default {
         );
 
         const transacciones = response.data;
-
         const resumen = {};
+
         transacciones.forEach(tx => {
           const code = tx.crypto_code.toLowerCase();
           const amount = parseFloat(tx.crypto_amount);
@@ -88,7 +88,6 @@ export default {
 
           const precioRes = await axios.get(`https://criptoya.com/api/satoshitango/${crypto}/ars`);
           const precio = precioRes.data.totalBid;
-
           const valor = cantidad * precio;
 
           estadoFinal.push({
@@ -113,7 +112,7 @@ export default {
 <style scoped>
 .estado-cripto {
   max-width: 800px;
-  margin: 100px auto 20px auto; /* deja espacio arriba para el NavBar */
+  margin: 100px auto 20px auto;
   text-align: center;
   padding: 20px;
 }

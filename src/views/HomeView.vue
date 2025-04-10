@@ -1,12 +1,10 @@
 <template>
   <div class="home">
-    <!-- Navbar reutilizable -->
     <NavBar />
 
     <h1>Bienvenido a Krustywallet</h1>
     <p>Tu billetera digital para administrar y comprar criptomonedas de forma segura.</p>
 
-    <!-- Sección de imágenes con epígrafes como botones -->
     <div class="features">
       <div class="feature" @click="navigateTo('CompraCripto')">
         <img src="../assets/compracripto.png" alt="Comprar Criptomonedas" />
@@ -29,21 +27,71 @@
         <p>Descubrí el rendimiento de tus inversiones</p>
       </div>
     </div>
+
+    <!-- Panel ticker de criptomonedas -->
+    <div class="ticker-container" v-if="resumen.length">
+      <div class="ticker">
+        <div class="ticker-track">
+          <span v-for="(item, index) in resumen" :key="index">
+            {{ item.crypto.toUpperCase() }}: {{ item.amount.toFixed(4) }} &nbsp;&nbsp;&nbsp;
+          </span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import NavBar from '@/components/NavBar.vue';
+import axios from 'axios';
 
 export default {
   name: 'HomeView',
-  components: {
-    NavBar
+  components: { NavBar },
+  data() {
+    return {
+      resumen: [],
+    };
   },
   methods: {
     navigateTo(routename) {
       this.$router.push({ name: routename });
+    },
+    async cargarResumen() {
+      try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        const userId = user?.id;
+        if (!userId) return;
+
+        const res = await axios.get(
+          `https://laboratorio3-f36a.restdb.io/rest/transactions?q={"user_id":"${userId}"}`,
+          {
+            headers: {
+              'x-apikey': '60eb09146661365596af552f',
+            },
+          }
+        );
+
+        const transacciones = res.data;
+        const resumen = {};
+
+        transacciones.forEach(tx => {
+          const crypto = tx.crypto_code.toLowerCase();
+          const cantidad = parseFloat(tx.crypto_amount);
+          if (!resumen[crypto]) resumen[crypto] = 0;
+          resumen[crypto] += tx.action === 'purchase' ? cantidad : -cantidad;
+        });
+
+        this.resumen = Object.entries(resumen)
+          .filter(([, val]) => val > 0)
+          .map(([crypto, amount]) => ({ crypto, amount }));
+      } catch (error) {
+        console.error("Error al cargar resumen de criptos:", error);
+      }
     }
+  },
+  mounted() {
+    this.cargarResumen();
   }
 };
 </script>
@@ -52,7 +100,7 @@ export default {
 .home {
   text-align: center;
   padding: 20px;
-  margin-top: 80px; /* para que no se tape con la navbar fija */
+  margin-top: 80px;
 }
 
 h1 {
@@ -98,5 +146,40 @@ p {
   font-size: 1em;
   color: #333;
   margin-top: 10px;
+}
+
+/* Ticker con fondo igual que App.vue */
+.ticker-container {
+  margin-top: 40px;
+  overflow: hidden;
+  width: 100%;
+  background: linear-gradient(to right, #fff0f5, #fcbab2);
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  padding: 10px 0;
+}
+
+.ticker {
+  white-space: nowrap;
+  overflow: hidden;
+  position: relative;
+}
+
+.ticker-track {
+  display: inline-block;
+  padding-left: 100%;
+  animation: scroll 15s linear infinite;
+  font-weight: bold;
+  color: #333;
+  font-size: 1.1em;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
 }
 </style>
