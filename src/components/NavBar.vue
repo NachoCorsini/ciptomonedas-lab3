@@ -51,12 +51,15 @@ export default {
         showCancelButton: true,
         confirmButtonText: 'Sí, salir',
         cancelButtonText: 'Cancelar',
-      });
+      })
 
       if (confirm.isConfirmed) {
-        localStorage.clear();
-        this.$store.dispatch("saveUserId", null);
-        this.$store.dispatch("saveUserEmail", null);
+        // Limpiar solo los datos temporales, NO el usuario
+        localStorage.removeItem('historialMovimientos')
+
+        // Vaciar Vuex
+        this.$store.dispatch("saveUserId", null)
+        this.$store.dispatch("saveUserEmail", null)
 
         await Swal.fire({
           icon: 'success',
@@ -64,9 +67,9 @@ export default {
           showConfirmButton: false,
           timer: 1500,
           timerProgressBar: true
-        });
+        })
 
-        this.$router.push({ name: 'LoginView' });
+        this.$router.push({ name: 'LoginView' })
       }
     }
   }

@@ -4,7 +4,7 @@ export default createStore({
   state: {
     userId: null,
     userEmail: null,
-   
+    userPassword: null,
   },
   getters: {
     getUserId(state) {
@@ -13,8 +13,9 @@ export default createStore({
     getUserEmail(state) {
       return state.userEmail;
     },
-  
-    
+    getUserPassword(state) {
+      return state.userPassword;
+    }
   },
   mutations: {
     setUserId(state, id) {
@@ -23,7 +24,9 @@ export default createStore({
     setUserEmail(state, email) {
       state.userEmail = email;
     },
-    
+    setUserPassword(state, password) {
+      state.userPassword = password;
+    }
   },
   actions: {
     saveUserId({ commit }, id) {
@@ -32,8 +35,9 @@ export default createStore({
     saveUserEmail({ commit }, email) {
       commit('setUserEmail', email);
     },
-    
-    
+    saveUserPassword({ commit }, password) {
+      commit('setUserPassword', password);
+    }
   },
-  modules: {},
+  modules: {}
 });
