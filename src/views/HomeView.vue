@@ -1,10 +1,12 @@
 <template>
   <div class="home">
+    <!-- Navbar reutilizable -->
     <NavBar />
 
     <h1>Bienvenido a Krustywallet</h1>
     <p>Tu billetera digital para administrar y comprar criptomonedas de forma segura.</p>
 
+    <!-- Sección de imágenes con epígrafes como botones -->
     <div class="features">
       <div class="feature" @click="navigateTo('CompraCripto')">
         <img src="../assets/compracripto.png" alt="Comprar Criptomonedas" />
@@ -28,10 +30,11 @@
       </div>
     </div>
 
-    <!-- Panel ticker de criptomonedas -->
+    <!-- Ticker de resumen de cripto -->
     <div class="ticker-container" v-if="resumen.length">
       <div class="ticker">
         <div class="ticker-track">
+          <span class="wallet-title">💰 Tu Billetera: </span>
           <span v-for="(item, index) in resumen" :key="index">
             {{ item.crypto.toUpperCase() }}: {{ item.amount.toFixed(4) }} &nbsp;&nbsp;&nbsp;
           </span>
@@ -47,7 +50,9 @@ import axios from 'axios';
 
 export default {
   name: 'HomeView',
-  components: { NavBar },
+  components: {
+    NavBar
+  },
   data() {
     return {
       resumen: [],
@@ -148,35 +153,39 @@ p {
   margin-top: 10px;
 }
 
-/* Ticker con fondo igual que App.vue */
+/* Ticker cripto */
 .ticker-container {
-  margin-top: 40px;
   overflow: hidden;
+  white-space: nowrap;
   width: 100%;
-  background: linear-gradient(to right, #fff0f5, #fcbab2);
-  border-top: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
+  margin-top: 40px;
   padding: 10px 0;
+  background: rgba(255, 255, 255, 0.4);
+  border-top: 2px solid #ddd;
+  border-bottom: 2px solid #ddd;
 }
 
 .ticker {
-  white-space: nowrap;
-  overflow: hidden;
-  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .ticker-track {
   display: inline-block;
-  padding-left: 100%;
-  animation: scroll 15s linear infinite;
-  font-weight: bold;
-  color: #333;
-  font-size: 1.1em;
+  animation: ticker-scroll 8s linear infinite;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #222;
 }
 
-@keyframes scroll {
+.wallet-title {
+  color: #000;
+  margin-right: 20px;
+}
+
+@keyframes ticker-scroll {
   0% {
-    transform: translateX(0%);
+    transform: translateX(100%);
   }
   100% {
     transform: translateX(-100%);

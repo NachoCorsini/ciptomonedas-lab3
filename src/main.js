@@ -14,3 +14,8 @@ if (!hasVisited) {
   // Crea la app normalmente
   createApp(App).use(store).use(router).mount('#app')
 }
+//limpia el localstorage solo en desarrollo//
+if (process.env.NODE_ENV === 'development') {
+  localStorage.removeItem('user'); // 
+}
+

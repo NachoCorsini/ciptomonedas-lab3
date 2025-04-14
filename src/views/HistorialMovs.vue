@@ -70,7 +70,8 @@ export default {
         `https://laboratorio3-f36a.restdb.io/rest/transactions?q={"user_id":"${user.id}"}`,
         { headers: { 'x-apikey': this.apiKey } }
       )
-      this.historial = res.data
+      // Ordenar por fecha descendente
+      this.historial = res.data.sort((a, b) => new Date(b.datetime) - new Date(a.datetime))
     },
 
     async verDetalle(id) {

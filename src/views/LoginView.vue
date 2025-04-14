@@ -1,17 +1,28 @@
 <template>
   <div class="login-container">
     <div class="login-box">
-      <img src="@/assets/krusty.jpg" alt="Krusty Logo" class="login-logo" />
       <h2 class="animated-text">¡Bienvenido a KrustyWallet!</h2>
 
       <div class="input-group">
         <label for="email">Correo electrónico:</label>
-        <input v-model="userEmail" type="email" id="email" placeholder="Introduce tu email" required />
+        <input
+          v-model="userEmail"
+          type="email"
+          id="email"
+          placeholder="Introduce tu email"
+          required
+        />
       </div>
 
       <div class="input-group">
         <label for="password">Contraseña:</label>
-        <input v-model="userPassword" type="password" id="password" placeholder="Introduce tu contraseña" required />
+        <input
+          v-model="userPassword"
+          type="password"
+          id="password"
+          placeholder="Introduce tu contraseña"
+          required
+        />
       </div>
 
       <ul class="validation-list" v-if="userPassword">
@@ -63,8 +74,8 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['saveUserId', 'saveUserEmail', 'saveUserPassword']),
-    
+    ...mapActions(['saveUserId', 'saveUserEmail']),
+
     async handleLogin() {
       this.error = null;
 
@@ -85,21 +96,19 @@ export default {
 
       let existingUser = JSON.parse(localStorage.getItem('user'));
 
-      if (existingUser && existingUser.email === this.userEmail && existingUser.password === this.userPassword) {
+      if (existingUser && existingUser.email === this.userEmail) {
         this.userId = existingUser.id;
       } else {
         this.userId = this.generateRandomId();
         existingUser = {
           id: this.userId,
-          email: this.userEmail,
-          password: this.userPassword
+          email: this.userEmail
         };
         localStorage.setItem('user', JSON.stringify(existingUser));
       }
 
       this.saveUserId(this.userId);
       this.saveUserEmail(this.userEmail);
-      this.saveUserPassword(this.userPassword);
 
       await Swal.fire({
         title: 'Bienvenido',
@@ -120,7 +129,6 @@ export default {
 </script>
 
 <style scoped>
-/* Misma estética que antes */
 .login-container {
   display: flex;
   justify-content: center;
@@ -129,21 +137,34 @@ export default {
 }
 
 .login-box {
-  background-color: white;
+  position: relative;
   padding: 40px 30px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   width: 340px;
   text-align: center;
+
+  background-image: url("@/assets/krustyportada.png");
+  background-size: cover;
+  background-position: center bottom 20px;
+  background-repeat: no-repeat;
+  overflow: hidden;
+
+  /* 🎯 Sombra negra para efecto flotante */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
-.login-logo {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 0;
-  margin-bottom: 15px;
-  border: 2px solid #ccc;
+.login-box::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: rgba(245, 246, 246, 0.431);
+  z-index: 0;
+  border-radius: 12px;
+}
+
+.login-box * {
+  position: relative;
+  z-index: 1;
 }
 
 .animated-text {
@@ -172,7 +193,7 @@ export default {
 }
 
 input {
-  width: 100%;
+  width: 90%;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -186,7 +207,7 @@ button {
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  width: 100%;
+  width: 90%;
   font-size: 16px;
 }
 
