@@ -11,18 +11,49 @@
           id="email"
           placeholder="Introduce tu email"
           required
+          maxlength="40"
         />
       </div>
 
       <div class="input-group">
         <label for="password">Contraseña:</label>
-        <input
-          v-model="userPassword"
-          type="password"
-          id="password"
-          placeholder="Introduce tu contraseña"
-          required
-        />
+        <div class="password-wrapper">
+          <input
+            :type="showPassword ? 'text' : 'password'"
+            v-model="userPassword"
+            id="password"
+            placeholder="Introduce tu contraseña"
+            required
+            maxlength="15"
+          />
+          <span class="eye-icon" @click="showPassword = !showPassword">
+            <svg
+              v-if="!showPassword"
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            <svg
+              v-else
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <path d="M17.94 17.94A10.94 10.94 0 0112 20C5 20 1 12 1 12a21.8 21.8 0 014.58-5.76M3 3l18 18" />
+            </svg>
+          </span>
+        </div>
       </div>
 
       <ul class="validation-list" v-if="userPassword">
@@ -54,6 +85,7 @@ export default {
       userPassword: '',
       userId: '',
       error: null,
+      showPassword: false,
     };
   },
   computed: {
@@ -71,11 +103,10 @@ export default {
     },
     isEmailValid() {
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.userEmail);
-    }
+    },
   },
   methods: {
     ...mapActions(['saveUserId', 'saveUserEmail']),
-
     async handleLogin() {
       this.error = null;
 
@@ -89,7 +120,12 @@ export default {
         return;
       }
 
-      if (!this.validLength || !this.hasUppercase || !this.hasLowercase || !this.hasNumber) {
+      if (
+        !this.validLength ||
+        !this.hasUppercase ||
+        !this.hasLowercase ||
+        !this.hasNumber
+      ) {
         this.error = 'La contraseña no cumple con los requisitos.';
         return;
       }
@@ -102,7 +138,7 @@ export default {
         this.userId = this.generateRandomId();
         existingUser = {
           id: this.userId,
-          email: this.userEmail
+          email: this.userEmail,
         };
         localStorage.setItem('user', JSON.stringify(existingUser));
       }
@@ -121,9 +157,12 @@ export default {
     },
 
     generateRandomId(length = 10) {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      return Array.from({ length }, () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
-    }
+      const chars =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      return Array.from({ length }, () =>
+        chars.charAt(Math.floor(Math.random() * chars.length))
+      ).join('');
+    },
   },
 };
 </script>
@@ -142,14 +181,11 @@ export default {
   border-radius: 12px;
   width: 340px;
   text-align: center;
-
   background-image: url("@/assets/krustyportada.png");
   background-size: cover;
   background-position: center bottom 20px;
   background-repeat: no-repeat;
   overflow: hidden;
-
-  /* 🎯 Sombra negra para efecto flotante */
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
@@ -185,19 +221,31 @@ export default {
   text-align: left;
 }
 
-.input-group label {
-  font-size: 14px;
-  margin-bottom: 5px;
-  display: block;
-  color: #555;
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 30px;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #333;
 }
 
 input {
-  width: 90%;
+  width: 100%;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 14px;
+  box-sizing: border-box;
 }
 
 button {
@@ -207,7 +255,7 @@ button {
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  width: 90%;
+  width: 100%;
   font-size: 16px;
 }
 
