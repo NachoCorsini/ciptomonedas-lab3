@@ -28,7 +28,7 @@
         </tfoot>
       </table>
 
-      <p v-else>Cargando datos...</p>
+      <p v-else class="no-trans">🚫 No se han registrado transacciones.</p>
     </div>
   </div>
 </template>
@@ -130,5 +130,11 @@ th, td {
 
 th {
   background-color: #f4f4f4;
+}
+
+.no-trans {
+  margin-top: 30px;
+  font-size: 1.2em;
+  color: #666;
 }
 </style>

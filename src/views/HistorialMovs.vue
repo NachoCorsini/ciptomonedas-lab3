@@ -4,7 +4,8 @@
 
     <div class="HistorialMovimientos">
       <h1>Historial de Movimientos</h1>
-      <table>
+
+      <table v-if="historial.length">
         <thead>
           <tr>
             <th>Tipo</th>
@@ -35,6 +36,8 @@
           </tr>
         </tbody>
       </table>
+
+      <p v-else class="no-mov">🚫 No se han registrado movimientos.</p>
     </div>
   </div>
 </template>
@@ -70,7 +73,6 @@ export default {
         `https://laboratorio3-f36a.restdb.io/rest/transactions?q={"user_id":"${user.id}"}`,
         { headers: { 'x-apikey': this.apiKey } }
       )
-      // Ordenar por fecha descendente
       this.historial = res.data.sort((a, b) => new Date(b.datetime) - new Date(a.datetime))
     },
 
@@ -178,5 +180,11 @@ button {
   font-size: 16px;
   border: none;
   background: none;
+}
+
+.no-mov {
+  margin-top: 20px;
+  font-size: 1.2em;
+  color: #888;
 }
 </style>

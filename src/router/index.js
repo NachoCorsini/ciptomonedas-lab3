@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import WelcomeView from '@/views/WelcomeView.vue'
 import LoginView from '@/views/LoginView.vue'
 import HomeView from '@/views/HomeView.vue'
 import CompraCripto from '@/views/CompraCripto.vue'
@@ -7,53 +6,70 @@ import VentaCripto from '@/views/VentaCripto.vue'
 import HistorialMovs from '@/views/HistorialMovs.vue'
 import EstadoCripto from '@/views/EstadoCripto.vue'
 import AnalisisInversion from '@/views/AnalisisInversion.vue'
+import Swal from 'sweetalert2'
 
 const routes = [
   {
     path: '/',
-    name: 'WelcomeView',
-    component: WelcomeView,
-  },
-  {
-    path: '/login',
     name: 'LoginView',
-    component: LoginView,
+    component: LoginView
   },
   {
     path: '/HomeView',
     name: 'HomeView',
-    component: HomeView,
+    component: HomeView
   },
   {
     path: '/CompraCripto',
     name: 'CompraCripto',
-    component: CompraCripto,
+    component: CompraCripto
   },
   {
     path: '/VentaCripto',
     name: 'VentaCripto',
-    component: VentaCripto,
+    component: VentaCripto
   },
   {
     path: '/HistorialMovs',
     name: 'HistorialMovs',
-    component: HistorialMovs,
+    component: HistorialMovs
   },
   {
     path: '/EstadoCripto',
     name: 'EstadoCripto',
-    component: EstadoCripto,
+    component: EstadoCripto
   },
   {
     path: '/AnalisisInversion',
     name: 'AnalisisInversion',
-    component: AnalisisInversion,
-  },
+    component: AnalisisInversion
+  }
 ]
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
-  routes,
+  routes
+})
+
+//Protegemos rutas para los vivos que saben programacion 
+router.beforeEach((to, from, next) => {
+  const rutasPublicas = ['LoginView']
+  const estaLogueado = !!localStorage.getItem('user')
+
+  if (!rutasPublicas.includes(to.name) && !estaLogueado) {
+    Swal.fire({
+      icon: 'info',
+      title: 'Acceso restringido',
+      text: 'Debes iniciar sesión para acceder a esta página',
+      confirmButtonText: 'Ok',
+      timer: 3000,
+      timerProgressBar: true
+    }).then(() => {
+      next({ name: 'LoginView' })
+    })
+  } else {
+    next()
+  }
 })
 
 export default router
