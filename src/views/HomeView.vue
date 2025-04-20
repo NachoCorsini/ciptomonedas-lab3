@@ -160,7 +160,6 @@ p {
   width: 100%;
   margin-top: 40px;
   padding: 10px 0;
-  background: rgba(255, 255, 255, 0.4);
   border-top: 2px solid #ddd;
   border-bottom: 2px solid #ddd;
 }
