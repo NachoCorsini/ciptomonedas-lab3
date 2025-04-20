@@ -7,6 +7,7 @@ import HistorialMovs from '@/views/HistorialMovs.vue'
 import EstadoCripto from '@/views/EstadoCripto.vue'
 import AnalisisInversion from '@/views/AnalisisInversion.vue'
 import Swal from 'sweetalert2'
+import WelcomeView from '@/views/WelcomeView.vue'
 
 const routes = [
   {
@@ -43,6 +44,11 @@ const routes = [
     path: '/AnalisisInversion',
     name: 'AnalisisInversion',
     component: AnalisisInversion
+  },
+  {
+    path: '/welcome',
+    name: 'WelcomeView',
+    component: WelcomeView
   }
 ]
 
@@ -51,9 +57,9 @@ const router = createRouter({
   routes
 })
 
-//Protegemos rutas para los vivos que saben programacion 
+//Protegemos rutas para los que saben programacion 
 router.beforeEach((to, from, next) => {
-  const rutasPublicas = ['LoginView']
+  const rutasPublicas = ['LoginView', 'WelcomeView']
   const estaLogueado = !!localStorage.getItem('user')
 
   if (!rutasPublicas.includes(to.name) && !estaLogueado) {
