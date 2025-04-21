@@ -145,6 +145,8 @@ export default {
 
       this.saveUserId(this.userId);
       this.saveUserEmail(this.userEmail);
+      
+      
 
       await Swal.fire({
         title: 'Bienvenido',

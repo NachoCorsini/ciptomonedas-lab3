@@ -11,7 +11,7 @@ if (!hasVisited) {
   // Redirecciona directamente al splash
   window.location.replace("/welcome")
 } else {
-  // Crea la app normalmente
+  
   createApp(App).use(store).use(router).mount('#app')
 }
 //limpia el localstorage solo en desarrollo//

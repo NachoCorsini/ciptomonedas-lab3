@@ -1,13 +1,13 @@
 <template>
   <div class="welcome">
-    <!-- Logo Krusty con animación -->
+    
     <img
       src="../assets/el-payaso-de-los-simpsons-el-h-roe-m-s-intratable-de-esta-caricatura-removebg-preview.png"
       alt="Logo Krusty"
       class="logo animate__animated zoomInCustom"
     />
 
-    <!-- Texto animado -->
+    
     <h1 class="animate__animated animate__fadeInUp animate__delay-1s">
       Bienvenido a KrustyWallet
     </h1>
@@ -28,7 +28,7 @@ export default {
 <style scoped>
 @import "https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css";
 
-/* 🎨 Fondo con gradiente animado pastel */
+
 .welcome {
   position: fixed;
   top: 0;
@@ -95,7 +95,7 @@ h1 {
   margin: 0;
 }
 
-/* 📱 Responsive */
+
 @media (max-height: 600px), (max-width: 480px) {
   .logo {
     max-height: 30vh;
@@ -107,7 +107,7 @@ h1 {
 }
 </style>
 
-<!-- Global: sin scroll ni márgenes -->
+
 <style>
 body,
 html {

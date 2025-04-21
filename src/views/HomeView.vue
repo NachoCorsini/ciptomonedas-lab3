@@ -1,12 +1,12 @@
 <template>
   <div class="home">
-    <!-- Navbar reutilizable -->
+    
     <NavBar />
 
     <h1>Bienvenido a Krustywallet</h1>
     <p>Tu billetera digital para administrar y comprar criptomonedas de forma segura.</p>
 
-    <!-- Sección de imágenes con epígrafes como botones -->
+    
     <div class="features">
       <div class="feature" @click="navigateTo('CompraCripto')">
         <img src="../assets/compracripto.png" alt="Comprar Criptomonedas" />
